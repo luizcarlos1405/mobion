@@ -7,22 +7,22 @@ touch      = {}
 function controls.load(w, h)
 	linesig = 200
 	circ.rad = 150
+	circ.ox = circ.rad + 80
+	circ.oy = h - circ.rad - 80
+	circ.dx = 0
+	circ.dy = 0
 	rect.w = circ.rad * 2
 	rect.h = circ.rad / 2
 	rect.x = w - rect.w - 80
 	rect.y = h - rect.h - 80
-	circ.ox = circ.rad + 80
-	circ.oy = h - circ.rad - 80
-	touch.x = 0
-	touch.y = 0
 	rect.ox = rect.x + (rect.w / 2)
 	rect.oy = rect.y + (rect.h / 2)
-	touch.x2 = touch.ox2
-	touch.y2 = touch.oy2
+	touch.x = 0
+	touch.y = 0
+	--touch.x2 = touch.ox2
+	--touch.y2 = touch.oy2
 	dx = 0
 	dy = 0
-	circ.dx = 0
-	circ.dy = 0
 	linelen = (dx ^ 2 + dy ^ 2) ^ (1 / 2)
 end
 
@@ -32,10 +32,10 @@ function controls.update(w, h)
 
 	-- If one touch is aplied Updates player speed
 	if touches[2] ~= nil then
-		x, y = love.touch.getPosition(touches[1])
-		if x < w / 2 then
-			dx = x - ox
-			dy = y - oy
+		touch.x, touch.y = love.touch.getPosition(touches[1])
+		if touch.x < w / 2 then
+			dx = touch.x - circ.ox
+			dy = touch.y - circ.oy
 			linelen = (dx ^ 2 + dy ^ 2) ^ (1 / 2)
 			circ.dx = circ.rad * (dx / linelen)
 			circ.dy = circ.rad * (dy / linelen)
@@ -46,27 +46,36 @@ function controls.update(w, h)
 				player.one.xvel = player.one.xvel + dx / linesig
 				player.one.yvel = player.one.yvel + dy / linesig
 			end
+			touch.x, touch.y = love.touch.getPosition(touches[2])
+			if touch.x > rect.ox then
+				player.one.r = player.one.r + 0.05
+			elseif touch.x < rect.ox then
+				player.one.r = player.one.r - 0.05
+			end
+		else
+			touch.x, touch.y = love.touch.getPosition(touch[2])
 		end
 	elseif touches[1] ~= nil then
-		if drawrefline == false then
-			drawrefline = true
-		else
-			x, y = love.touch.getPosition(touches[1])
-			if x < w / 2 then
-				dx = touch.x - circ.ox
-				dy = touch.y - circ.oy
-				linelen = (dx ^ 2 + dy ^ 2) ^ (1 / 2)
-				circ.dx = circ.rad * (dx / linelen)
-				circ.dy = circ.rad * (dy / linelen)
-				if linelen > circ.rad then
-					player.one.xvel = player.one.xvel + (circ.dx / linesig)
-					player.one.yvel = player.one.yvel + (circ .dy / linesig)
-				else
-					player.one.xvel = player.one.xvel + dx / linesig
-					player.one.yvel = player.one.yvel + dy / linesig
-				end
+		touch.x, touch.y = love.touch.getPosition(touches[1])
+		if touch.x < w / 2 then
+			dx = touch.x - circ.ox
+			dy = touch.y - circ.oy
+			linelen = (dx ^ 2 + dy ^ 2) ^ (1 / 2)
+			circ.dx = circ.rad * (dx / linelen)
+			circ.dy = circ.rad * (dy / linelen)
+			if linelen > circ.rad then
+				player.one.xvel = player.one.xvel + (circ.dx / linesig)
+				player.one.yvel = player.one.yvel + (circ .dy / linesig)
 			else
-				touch.x2, touch.y2 = love.touch.getPosition(touches[1])
+				player.one.xvel = player.one.xvel + dx / linesig
+				player.one.yvel = player.one.yvel + dy / linesig
+			end
+		else
+			touch.x, touch.y = love.touch.getPosition(touches[1])
+			if touch.x > rect.ox then
+				player.one.r = player.one.r + 0.05
+			elseif touch.x < rect.ox then
+				player.one.r = player.one.r - 0.05
 			end
 		end
 	end
@@ -76,7 +85,7 @@ function controls.draw(w, h)
 	-- Draws the control references
 	love.graphics.setColor(0, 200, 30)
 
-	if touches[1] ~= nil and x < w / 2 then
+	if touches[1] ~= nil and touch.x < w / 2 then
 		if linelen > circ.rad then
 			love.graphics.line(circ.ox, circ.oy, circ.ox + circ.dx, circ.oy + circ.dy)
 		else

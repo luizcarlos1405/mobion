@@ -1,7 +1,7 @@
 player = {one = {}, two = {}, tree = {}, four = {}}
 
 function player.load(width, height)
-	player.one.i = love.graphics.newImage("sprites/player.png")
+	player.one.i = love.graphics.newImage("sprites/player2.png")
 	player.one.x = width / 2 - 10
 	player.one.y = height / 2 - 10
 	player.one.w = 20
