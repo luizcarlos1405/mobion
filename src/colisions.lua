@@ -1,4 +1,4 @@
-text = "Colisions:"
+text = "Last colisions:"
 --Colisions betwen bullets and enemies
 function beginContact(fa, fb, coll)
 	-- Destroy the bodies and erase enemies and bullets that collide
@@ -18,7 +18,7 @@ function beginContact(fa, fb, coll)
 			end
 		end
 	end
-	text = "Last Colision: "..fa:getUserData().." and "..fb:getUserData()
+	text = "Last colision: "..fa:getUserData().." and "..fb:getUserData()
 end
 
 function endContact(a, b, coll)

@@ -1,13 +1,14 @@
 Player = {}
 
 function Player.load(Width, Height)
-	Player.image             = love.graphics.newImage("sprites/pwgun.png")
-	Player.shotspark         = love.graphics.newImage("sprites/shotspark.png")
-	Player.body              = love.physics.newBody(World, Player.x, Player.y, "dynamic")
-	Player.shape             = love.physics.newRectangleShape(Player.image:getWidth(), Player.image:getHeight())
+	Player.image             = love.graphics.newImage("sprites/pwneon.png")
+	Player.scale             = 1
+	Player.shotspark         = love.graphics.newImage("sprites/sneon.png")
+	Player.w                 = Player.image:getWidth() * Player.scale
+	Player.h                 = Player.image:getHeight() * Player.scale
+	Player.body              = love.physics.newBody(World, Width / 2, Height / 2, "dynamic")
+	Player.shape             = love.physics.newRectangleShape(Player.w, Player.h)
 	Player.fixture           = love.physics.newFixture(Player.body, Player.shape, 5)
-	Player.w                 = Player.image:getWidth()
-	Player.h                 = Player.image:getHeight()
 	Player.xvel, Player.yvel = 0, 0
 	Player.avel              = 5
 	Player.prop              = 40
@@ -15,14 +16,18 @@ function Player.load(Width, Height)
 	Player.sparktime         = 0
 	Player.bullets           = {}
 	Player.fixture:setUserData("Player")
-	Player.body:setX(Width / 2)
-	Player.body:setY(Height / 2)
 	Player.body:setAngle(- math.pi / 2)
 	Player.body:setLinearDamping(1)
 	Player.body:setAngularDamping(15)
-	--Player.body:setAngularVelocity(Player.avel)
+	--Player.image:setFilter("nearest", "nearest")
+	--Player.body:setAngularVelocity(15)
 	--Player.body:setLinearVelocity(100, 0)
 	--Player.fixture:setMask(10)
+
+	bullimg = love.graphics.newImage("sprites/bneon.png")
+
+	rgb = -999999999
+	ColorChangeVel = 0.05
 end
 
 function Player.update(dt)
@@ -30,13 +35,42 @@ function Player.update(dt)
 	Player.xvel, Player.yvel = Player.body:getLinearVelocity()
 	Player.cooldown  = Player.cooldown - dt
 	Player.sparktime = Player.sparktime - dt
+
+	for i, b in ipairs(Player.bullets) do
+		b.lifetime = b.lifetime - dt
+		if b.lifetime <= 0 then
+			table.remove(Player.bullets, i)
+		end
+	end
+	rgb = rgb + ColorChangeVel * dt
 end
 
 function Player.draw()
 	-- Draws the Player
-	love.graphics.setColor(255, 255, 255)
-	love.graphics.draw(Player.image, Player.body:getX(), Player.body:getY(), Player.body:getAngle(), 1, 1, Player.w / 2, Player.h / 2)
+	love.graphics.setColor((math.sin(rgb) + 1) * 127.5, --R
+	(math.sin(rgb + 2/3 * math.pi) + 1) * 127.5, --G
+	(math.sin(rgb + 1/3 * math.pi) + 1) * 127.5) --B
+
+	love.graphics.draw(Player.image, -- Image
+	Player.body:getX(), -- X position
+	Player.body:getY(), -- Y position
+	Player.body:getAngle(), Player.scale, Player.scale, -- Angle and scale
+	Player.w / 2, -- X center
+	Player.h / 2) -- Y center
 	-- (image, xposition, yposition, rotation, multiplyimageWidth, multiplyimageHeight, xcenter, ycenter, kx, ky)
+
+	for _,b in ipairs(Player.bullets) do
+		love.graphics.draw(b.image, b.body:getX(), b.body:getY(), b.body:getAngle(), b.stretch, b.stretch, b.w / 4, b.h / 2)
+	end
+
+	if Player.sparktime > 0 then
+		love.graphics.draw(Player.shotspark,
+		Player.body:getX() + (Player.h / 2 - 12) * math.cos(Player.body:getAngle()),
+		Player.body:getY() + (Player.w / 2 - 12) * math.sin(Player.body:getAngle()),
+		Player.body:getAngle(), Player.scale, Player.scale,
+		Player.shotspark:getWidth() / 2,
+		Player.shotspark:getHeight() / 2)
+	end
 end
 
 function Player.fire()
@@ -52,7 +86,7 @@ function Player.fire()
 		bullet.h         = bullimg:getHeight()
 		bullet.vel       = 2000
 		bullet.stretch   = 1
-		bullet.lifetime  = 1.5
+		bullet.lifetime  = 1
 		bullet.fixture:setUserData("Bullet")
 		bullet.body:setBullet(true)
 		bullet.body:setAngle(Player.body:getAngle())

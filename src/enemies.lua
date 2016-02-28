@@ -1,3 +1,5 @@
+
+
 Enemies     = {}
 SpawnTime   = 0
 Behavior    = 1
@@ -9,10 +11,10 @@ function Enemies.spawn(w, h)
 	if SpawnTime < 0 then
 		SpawnTime      = love.math.random(2, 4)
 		enemy          = {}
-		enemy.image    = love.graphics.newImage("sprites/enemy.png")
-		enemy.r        = 16
-		enemy.x        = w / 2--love.math.random(enemy.r, w - enemy.r)
-		enemy.y        = h / 2 - 100--love.math.random(enemy.r, 300)
+		enemy.image    = love.graphics.newImage("sprites/eneon.png")
+		enemy.r        = enemy.image:getWidth() / 2
+		enemy.x        = love.math.random(enemy.r, w - enemy.r)
+		enemy.y        = love.math.random(enemy.r, 300)
 		enemy.vel      = 200
 		enemy.betime   = 0
 		enemy.body     = love.physics.newBody(World, enemy.x, enemy.y, "dynamic")
@@ -78,15 +80,15 @@ end
 
 function Enemies.draw()
 
+	if morritimer > 0 then
+		love.graphics.print("Morri!", morrix, morriy)
+	end
 	for _,e in ipairs(Enemies) do
 		if e.body:isDestroyed() == false then
 			love.graphics.setColor(e.red, e.green, e.blue)
-			love.graphics.circle("fill", e.body:getX(), e.body:getY(), e.r)
-			love.graphics.setColor(255, 255, 255)
-			love.graphics.draw(enemy.image, e.body:getX(), e.body:getY(), e.body:getAngle(), 1, 1, 16, 16)
+			love.graphics.draw(enemy.image, e.body:getX(), e.body:getY(), e.body:getAngle(), 1, 1, e.r, e.r)
+			--love.graphics.setColor(255, 255, 255)
+			--love.graphics.circle("fill", e.body:getX(), e.body:getY(), e.r - 4)
 		end
-	end
-	if morritimer > 0 then
-		love.graphics.print("Morri!", morrix, morriy)
 	end
 end
