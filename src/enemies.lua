@@ -1,17 +1,19 @@
+Enemies        = {}
+SpawnTime      = 0
+Behavior       = 1
+morritimer     = 0
+pxvel, pyvel   = 0, 0
 
-
-Enemies     = {}
-SpawnTime   = 0
-Behavior    = 1
-morritimer  = 0
-morrix      = 0
-morriy      = 0
+function Enemies.load()
+	Enemies.image    = love.graphics.newImage("sprites/eneon.png")
+	Enemies.particle = love.graphics.newImage("sprites/particle.png")
+end
 
 function Enemies.spawn(w, h)
 	if SpawnTime < 0 then
 		SpawnTime      = love.math.random(2, 4)
 		enemy          = {}
-		enemy.image    = love.graphics.newImage("sprites/eneon.png")
+		enemy.image    = Enemies.image
 		enemy.r        = enemy.image:getWidth() / 2
 		enemy.x        = love.math.random(enemy.r, w - enemy.r)
 		enemy.y        = love.math.random(enemy.r, 300)
@@ -21,9 +23,9 @@ function Enemies.spawn(w, h)
 		enemy.shape    = love.physics.newCircleShape(enemy.r)
 		enemy.fixture  = love.physics.newFixture(enemy.body, enemy.shape, 0.05)
 		enemy.behavior = love.math.random(1, 5)
-		enemy.red      = love.math.random(0, 255)
-		enemy.green    = love.math.random(0, 255)
-		enemy.blue     = love.math.random(0, 255)
+		enemy.red      = love.math.random(100, 255)
+		enemy.green    = love.math.random(100, 255)
+		enemy.blue     = love.math.random(100, 255)
 		enemy.fixture:setUserData("Enemy")
 		table.insert(Enemies, enemy)
 	end
@@ -81,14 +83,11 @@ end
 function Enemies.draw()
 
 	if morritimer > 0 then
-		love.graphics.print("Morri!", morrix, morriy)
+		love.graphics.setFont(ecranbig)
+		love.graphics.print("Morri!",  morrix - 30 , morriy - 10)
 	end
 	for _,e in ipairs(Enemies) do
-		if e.body:isDestroyed() == false then
 			love.graphics.setColor(e.red, e.green, e.blue)
 			love.graphics.draw(enemy.image, e.body:getX(), e.body:getY(), e.body:getAngle(), 1, 1, e.r, e.r)
-			--love.graphics.setColor(255, 255, 255)
-			--love.graphics.circle("fill", e.body:getX(), e.body:getY(), e.r - 4)
-		end
 	end
 end

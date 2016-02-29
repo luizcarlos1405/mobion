@@ -1,6 +1,7 @@
 Player = {}
 
 function Player.load(Width, Height)
+	Player.shotparticle      = love.graphics.newImage("sprites/sparticle.png")
 	Player.image             = love.graphics.newImage("sprites/pwneon.png")
 	Player.scale             = 1
 	Player.shotspark         = love.graphics.newImage("sprites/sneon.png")
@@ -16,13 +17,14 @@ function Player.load(Width, Height)
 	Player.sparktime         = 0
 	Player.bullets           = {}
 	Player.fixture:setUserData("Player")
-	Player.body:setAngle(- math.pi / 2)
+	Player.body:setAngle(0)
+	Player.angle             = Player.body:getAngle() - math.pi / 2
 	Player.body:setLinearDamping(1)
 	Player.body:setAngularDamping(15)
 	--Player.image:setFilter("nearest", "nearest")
-	--Player.body:setAngularVelocity(15)
+	--Player.body:setAngularVelocity(5)
 	--Player.body:setLinearVelocity(100, 0)
-	--Player.fixture:setMask(10)
+	Player.fixture:setCategory(2)
 
 	bullimg = love.graphics.newImage("sprites/bneon.png")
 
@@ -32,9 +34,10 @@ end
 
 function Player.update(dt)
 	-- Updates Player position
+	Player.angle             = Player.body:getAngle() - math.pi / 2
 	Player.xvel, Player.yvel = Player.body:getLinearVelocity()
-	Player.cooldown  = Player.cooldown - dt
-	Player.sparktime = Player.sparktime - dt
+	Player.cooldown          = Player.cooldown - dt
+	Player.sparktime         = Player.sparktime - dt
 
 	for i, b in ipairs(Player.bullets) do
 		b.lifetime = b.lifetime - dt
@@ -48,15 +51,15 @@ end
 function Player.draw()
 	-- Draws the Player
 	love.graphics.setColor((math.sin(rgb) + 1) * 127.5, --R
-	(math.sin(rgb + 2/3 * math.pi) + 1) * 127.5, --G
-	(math.sin(rgb + 1/3 * math.pi) + 1) * 127.5) --B
+	(math.sin(rgb + 2/3 * math.pi) + 1) * 127.5,        --G
+	(math.sin(rgb + 4/3 * math.pi) + 1) * 127.5)        --B
 
-	love.graphics.draw(Player.image, -- Image
-	Player.body:getX(), -- X position
-	Player.body:getY(), -- Y position
-	Player.body:getAngle(), Player.scale, Player.scale, -- Angle and scale
-	Player.w / 2, -- X center
-	Player.h / 2) -- Y center
+	love.graphics.draw(Player.image,                    -- Image
+	Player.body:getX(),                                 -- X position
+	Player.body:getY(),                                 -- Y position
+	Player.angle, Player.scale, Player.scale, -- Angle and scale
+	Player.w / 2,                                       -- X center
+	Player.h / 2)                                       -- Y center
 	-- (image, xposition, yposition, rotation, multiplyimageWidth, multiplyimageHeight, xcenter, ycenter, kx, ky)
 
 	for _,b in ipairs(Player.bullets) do
@@ -65,9 +68,9 @@ function Player.draw()
 
 	if Player.sparktime > 0 then
 		love.graphics.draw(Player.shotspark,
-		Player.body:getX() + (Player.h / 2 - 12) * math.cos(Player.body:getAngle()),
-		Player.body:getY() + (Player.w / 2 - 12) * math.sin(Player.body:getAngle()),
-		Player.body:getAngle(), Player.scale, Player.scale,
+		Player.body:getX() + (Player.h / 2 - 12) * math.cos(Player.angle),
+		Player.body:getY() + (Player.w / 2 - 12) * math.sin(Player.angle),
+		Player.angle, Player.scale, Player.scale,
 		Player.shotspark:getWidth() / 2,
 		Player.shotspark:getHeight() / 2)
 	end
@@ -89,11 +92,24 @@ function Player.fire()
 		bullet.lifetime  = 1
 		bullet.fixture:setUserData("Bullet")
 		bullet.body:setBullet(true)
-		bullet.body:setAngle(Player.body:getAngle())
+		bullet.body:setAngle(Player.angle)
 		bullet.body:setX((((Player.h + 18) / 2) * math.cos(bullet.body:getAngle())) + Player.body:getX())
 		bullet.body:setY((((Player.w + 18) / 2) * math.sin(bullet.body:getAngle())) + Player.body:getY())
 		bullet.body:setLinearVelocity(bullet.vel * math.cos(bullet.body:getAngle()), bullet.vel * math.sin(bullet.body:getAngle()))
-		--bullet.fixture:setMask(10)
+
+		Particles.emit(5,            -- Particle Damping
+		math.pi / 12,                -- SpreadAngle
+		Player.shotparticle,         -- ParticleImage
+		100,                         -- Number
+		300,                         -- Speed
+		3,                           -- LifeTime
+		255,                         -- ParticleRed
+		255,                         -- ParticleGreen
+		255,                         -- ParticleBlue
+		Player.body:getX() + (Player.h / 2 - 12) * math.cos(Player.angle),          -- EmitX
+		Player.body:getY() + (Player.w / 2 - 12) * math.sin(Player.angle),          -- EmitY
+		Player.angle)      -- EmitAngle
+
 		table.insert(Player.bullets, bullet)
 		shot:play()
 	end

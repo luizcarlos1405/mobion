@@ -1,4 +1,3 @@
-
 Controls    = {}
 move        = {}
 spin        = {}
@@ -14,6 +13,7 @@ function Controls.load(w, h)
 	move.dx      = 0
 	move.dy      = 0
 	move.linelen = 0
+	move.dangle  = 0
 	-- Reference rectangle for spinning properties
 	spin.image   = love.graphics.newImage("sprites/spin.png")
 	spin.w       = spin.image:getWidth()
@@ -55,8 +55,9 @@ function Controls.update(w, h, dt)
 			if touch.x < w / 2 then
 				-- Update the x and y variation betwen the touch and the center
 				-- Of the reference circle
-				dx = touch.x - move.ox
-				dy = touch.y - move.oy
+				dx           = touch.x - move.ox
+				dy           = touch.y - move.oy
+				move.dangle  = ((math.cos(Player.body:getAngle()) * dx + math.sin(Player.body:getAngle()) * dy) / move.linelen)
 				-- Update the distance betwen the touche and the center of the
 				-- Circle
 				move.linelen = (dx ^ 2 + dy ^ 2) ^ (1 / 2)
@@ -68,10 +69,28 @@ function Controls.update(w, h, dt)
 				if move.linelen > move.rad then
 					-- Then use the equivalent inside the circle
 					Player.body:applyForce(move.dx * Player.prop, move.dy * Player.prop)
+
+					if move.dangle < 0.3
+					and move.dangle > 0.3 then
+							Player.body:setAngularVelocity(0)
+					elseif move.dangle < 0 then
+							Player.body:setAngularVelocity(-5)
+					else
+							Player.body:setAngularVelocity(5)
+					end
 				else
 					-- else you just use the real variation betwen the touch
 					-- and the center of the circle
 					Player.body:applyForce(dx * Player.prop, dy * Player.prop)
+
+					if move.dangle < 0.01
+					and move.dangle > 0.01 then
+							Player.body:setAngularVelocity(0)
+					elseif move.dangle < 0 then
+							Player.body:setAngularVelocity(-5)
+					else
+							Player.body:setAngularVelocity(5)
+					end
 				end
 			-- Or if the Player is trying two rotate
 			elseif touch.y > spin.y - 5 and touch.y < spin.y + spin.h + 5 then
