@@ -6,8 +6,7 @@ function beginContact(fa, fb, coll)
 		if b.fixture == fa or b.fixture == fb then
 			for i,e in ipairs(Enemies) do
 					if e.fixture == fa or e.fixture == fb then
-					love.graphics.setColor(255, 255, 255)
-
+					-- emit the particles (enemy explosion)
 					Particles.emit(2,           -- Particle Damping
 					math.pi / 2,                -- SpreadAngle
 					Enemies.particle,           -- ParticleImage
@@ -20,11 +19,12 @@ function beginContact(fa, fb, coll)
 					e.body:getX(),              -- EmitX
 					e.body:getY(),              -- EmitY
 					b.body:getAngle())          -- EmitAngle
-
+					-- Set where the Morri! text should appear
 					morrix = e.body:getX()
 					morriy = e.body:getY()
 					morritimer = 2
 					morri:play()
+					-- Kills enemy and bullet
 					table.remove(Enemies, i)
 					table.remove(Player.bullets, j)
 					e.body:destroy()
@@ -33,6 +33,7 @@ function beginContact(fa, fb, coll)
 			end
 		end
 	end
+	--Just for controlling purposes
 	text = "Last colision: "..fa:getUserData().." and "..fb:getUserData()
 end
 

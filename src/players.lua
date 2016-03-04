@@ -29,10 +29,13 @@ function Player.load(Width, Height)
 	bullimg = love.graphics.newImage("sprites/bneon.png")
 
 	rgb = -999999999
-	ColorChangeVel = 0.05
+	ColorChangeVel = 0.02
 end
 
 function Player.update(dt)
+	-- For changing colors with the time
+	rgb = rgb + ColorChangeVel * dt
+
 	-- Updates Player position
 	Player.angle             = Player.body:getAngle() - math.pi / 2
 	Player.xvel, Player.yvel = Player.body:getLinearVelocity()
@@ -45,14 +48,15 @@ function Player.update(dt)
 			table.remove(Player.bullets, i)
 		end
 	end
-	rgb = rgb + ColorChangeVel * dt
 end
 
 function Player.draw()
-	-- Draws the Player
+	-- Change color over the time
 	love.graphics.setColor((math.sin(rgb) + 1) * 127.5, --R
 	(math.sin(rgb + 2/3 * math.pi) + 1) * 127.5,        --G
 	(math.sin(rgb + 4/3 * math.pi) + 1) * 127.5)        --B
+
+	-- Draws the Player
 
 	love.graphics.draw(Player.image,                    -- Image
 	Player.body:getX(),                                 -- X position
@@ -97,20 +101,21 @@ function Player.fire()
 		bullet.body:setY((((Player.w + 18) / 2) * math.sin(bullet.body:getAngle())) + Player.body:getY())
 		bullet.body:setLinearVelocity(bullet.vel * math.cos(bullet.body:getAngle()), bullet.vel * math.sin(bullet.body:getAngle()))
 
-		Particles.emit(5,            -- Particle Damping
-		math.pi / 12,                -- SpreadAngle
-		Player.shotparticle,         -- ParticleImage
-		100,                         -- Number
-		300,                         -- Speed
-		3,                           -- LifeTime
-		255,                         -- ParticleRed
-		255,                         -- ParticleGreen
-		255,                         -- ParticleBlue
-		Player.body:getX() + (Player.h / 2 - 12) * math.cos(Player.angle),          -- EmitX
-		Player.body:getY() + (Player.w / 2 - 12) * math.sin(Player.angle),          -- EmitY
+		Particles.emit(5,                                                  -- Particle Damping
+		math.pi / 12,                                                      -- SpreadAngle
+		Player.shotparticle,                                               -- ParticleImage
+		100,                                                               -- Number
+		300,                                                               -- Speed
+		3,                                                                 -- LifeTime
+		(math.sin(rgb) + 1) * 127.5,                                       -- R
+		(math.sin(rgb + 2/3 * math.pi) + 1) * 127.5,                       -- G
+		(math.sin(rgb + 4/3 * math.pi) + 1) * 127.5,                       -- B
+		Player.body:getX() + (Player.h / 2 - 12) * math.cos(Player.angle), -- EmitX
+		Player.body:getY() + (Player.w / 2 - 12) * math.sin(Player.angle), -- EmitY
 		Player.angle)      -- EmitAngle
 
 		table.insert(Player.bullets, bullet)
+
 		shot:play()
 	end
 end

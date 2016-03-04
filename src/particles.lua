@@ -13,6 +13,7 @@ end
 --Draw any particle system existing
 function Particles.draw()
 	for _,P in ipairs(Particles) do
+		love.graphics.getColor(P)
 		love.graphics.draw(P, P.x, P.y)
 	end
 end
