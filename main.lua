@@ -12,12 +12,12 @@ Gamestate = require "src/humplib/gamestate"
 
 -- Defining some global variables
 settings              = {}
-Width, Height         = 1280, 720
-gameWidth, gameHeight = love.window.getDesktopDimensions()
+Width, Height         = 1920, 1080
+screenWidth, screenHeight = love.window.getDesktopDimensions()
 
 function love.load()
 	-- Screen scaling
-	push:setupScreen(Width, Height, gameWidth, gameHeight, {fullscreen = true, resizable = false})
+	push:setupScreen(Width, Height, screenWidth, screenHeight, {fullscreen = true, resizable = false})
 	push:setBorderColor{love.graphics.getBackgroundColor()}
 
 	-- Save game stuff
@@ -25,14 +25,14 @@ function love.load()
 	savefile = savedir.."/mobion.savegame"
 
 	-- Font load
-	ecran        = love.graphics.newFont("fonts/ecran-monochrome.ttf", 12)
-	ecranbig     = love.graphics.newFont("fonts/ecran-monochrome.ttf", 60)
-	ecranbigger  = love.graphics.newFont("fonts/ecran-monochrome.ttf", 80)
+	ecran        = love.graphics.newFont("fonts/ecran-monochrome.ttf", 24)
+	ecranbig     = love.graphics.newFont("fonts/ecran-monochrome.ttf", 80)
+	ecranbigger  = love.graphics.newFont("fonts/ecran-monochrome.ttf", 120)
 
 	-- Load settings if they already exists, if don't just create the standard
-	if love.filesystem.exists("mobion.savegame") then
-		LoadSettings()
-	else
+	-- if love.filesystem.exists("mobion.savegame") then
+	-- 	LoadSettings()
+	-- else
 		love.filesystem.write("mobion.savegame", '')
 		settings.gametime      = 0
 		settings.MusicVolume   = 1
@@ -40,18 +40,18 @@ function love.load()
 		settings.controls      = "RotationAtLeft"
 		settings.language      = "Choose"
 		settings.Portuguese    = {mainmenu    = {"Jogar", "Opções", "Sair"},
-								  optionsmenu = {"Configurações", "Controle de giro", "Volume da música", "Volume dos efeitos", "Salvar", "Cancelar"}}
+								  optionsmenu = {"Configurações", "Idioma", "Controle de giro", "Volume da música", "Volume dos efeitos", "Salvar", "Cancelar"}}
 
 		settings.English       = {mainmenu    = {"Play", "Options", "Quit"},
-								  optionsmenu = {"Settings", "Rotation control", "Music volume", "Save", "Effects volume", "Cancel"}}
+								  optionsmenu = {"Settings", "Language", "Rotation control", "Music volume", "Save", "Effects volume", "Cancel"}}
 		SaveSettings()
-	end
+	-- end
 
 	-- Gamestate control from humplib
     Gamestate.registerEvents()
     Gamestate.switch(mainmenu)
 end
--- Simple function for saveing the settings
+-- Simple function for saving the settings
 function SaveSettings()
 	table.save(settings, savefile)
 end

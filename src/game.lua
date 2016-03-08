@@ -11,25 +11,25 @@ function game:enter()
 	World = love.physics.newWorld(0, 0, true)
 	World:setCallbacks(beginContact, endContact, preSolve, postSolve)
 
-	--Getting Width and creating a chainshape that won't allow to get out of the screen
+	--Getting screenWidth and creating a chainshape that won't allow to get out of the screen
 	Border         = {}
 	Border.body    = love.physics.newBody(World, 0, 0, "static")
 	Border.shape   = love.physics.newChainShape(true, 0, 0, Width, 0, Width, Height, 0, Height)
 	Border.fixture = love.physics.newFixture(Border.body, Border.shape)
 	Border.ebody   = love.physics.newBody(World, 0, 0, "static")
-	Border.eshape  = love.physics.newChainShape(false, 0, 400, Width, 400)
+	Border.eshape  = love.physics.newChainShape(false, 0,600, Width, 800)
 	Border.efixture= love.physics.newFixture(Border.ebody, Border.eshape)
 	Border.efixture:setUserData("Enemy Border")
 	Border.fixture:setUserData("Border")
 	Border.efixture:setMask(2)
 
-	Player.load(Width, Height)
+	Player.load()
 
 	Enemies.load()
 
-	love.graphics.setLineWidth(1)
+	love.graphics.setLineWidth(2)
 
-	Controls.load(Width, Height)
+	Controls.load()
 
 	if settings.MusicVolume ~= nil then
 		love.audio.setVolume(settings.MusicVolume)
@@ -49,9 +49,9 @@ function game:update(dt)
 
 
 	World:update(dt)
-	Controls.update(Width, Height, dt)
+	Controls.update(dt)
 	Player.update(dt)
-	Enemies.spawn(Width, Height)
+	Enemies.spawn(dt)
 	Enemies.update(dt)
 
 	if love.keyboard.isDown("space") then
@@ -71,11 +71,11 @@ function game:draw()
 	-- The draw functions that should run in the gama gamestate
 	Enemies.draw()
 	Player.draw()
-	Controls.draw(Width, Height, dt)
+	Controls.draw(dt)
 	Particles.draw()
 	if morritimer > 0 then
 		love.graphics.setFont(ecranbig)
-		love.graphics.print("Morri!",  morrix - 30 , morriy - 10)
+		love.graphics.print("Morri!",  morrix - 45 , morriy - 15)
 	end
 
 
@@ -91,6 +91,7 @@ function game:draw()
 	"\nExisting bullets: "..#Player.bullets..
 	"\nScreen Width: "..Width..
 	"\nScreen Height: "..Height..
+	"\nScreen Dangle: "..move.dangle..
 	"\nExisting enemies: "..#Enemies..
 	"\nLast behavior: "..Behavior..
 	"\n"..text..

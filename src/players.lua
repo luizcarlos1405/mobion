@@ -1,6 +1,6 @@
 Player = {}
 
-function Player.load(Width, Height)
+function Player.load()
 	Player.shotparticle      = love.graphics.newImage("sprites/sparticle.png")
 	Player.image             = love.graphics.newImage("sprites/pwneon.png")
 	Player.scale             = 1
@@ -11,8 +11,8 @@ function Player.load(Width, Height)
 	Player.shape             = love.physics.newRectangleShape(Player.w, Player.h)
 	Player.fixture           = love.physics.newFixture(Player.body, Player.shape, 5)
 	Player.xvel, Player.yvel = 0, 0
-	Player.avel              = 5
-	Player.prop              = 40
+	Player.avel              = 7
+	Player.prop              = 80
 	Player.cooldown          = 0
 	Player.sparktime         = 0
 	Player.bullets           = {}

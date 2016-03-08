@@ -32,7 +32,7 @@ function mainmenu:enter()
 	options.w      = options.button:getWidth()
 	options.h      = options.button:getHeight()
 	options.x      = logo.x
-	options.y      = logo.y + 200
+	options.y      = logo.y + logo.h
 	options.y2     = options.y + options.h
 	options.y3     = options.y2 + options.h
 	options.ox     = options.w / 2
@@ -46,7 +46,7 @@ function mainmenu:enter()
 	elseif settings.language == "English" then
 		options.text = settings.English.mainmenu
 	else
-		options.text = settings.English.mainmenu
+		options.text = settings.Portuguese.mainmenu
 	end
 
 	-- Text objects creation
@@ -56,10 +56,10 @@ function mainmenu:enter()
 end
 
 function mainmenu:update(dt)
-	if logo.scale < 0.6 then
+	if logo.scale < 1 then
 		logo.scale = logo.scale + dt / 8
-	elseif logo.scale > 0.6 then
-		logo.scale = 0.6
+	elseif logo.scale > 1 then
+		logo.scale = 1
 	end
 end
 
@@ -75,7 +75,7 @@ function mainmenu:draw()
 
 	--Draw logo and menu
 	love.graphics.draw(logo.image, logo.x, logo.y, logo.angle, logo.scale, logo.scale, logo.ox, logo.oy)
-	if logo.scale == 0.6 then
+	if logo.scale == 1 then
 
 		-- Draw buttons
 		love.graphics.draw(options.button, options.x, options.y, options.angle, options.scale, options.scale, options.ox, options.oy)
@@ -84,9 +84,9 @@ function mainmenu:draw()
 
 		-- Draw text
 		-- love.graphics.setColor(255, 255, 255)
-		love.graphics.draw(Play, options.x, options.y + options.h / 2, 0, 1, 1, Play:getWidth() / 2, Play:getHeight() / 2)
-		love.graphics.draw(Options, options.x, options.y2 + options.h / 2, 0, 1, 1, Options:getWidth() / 2, Options:getHeight() / 2)
-		love.graphics.draw(Quit, options.x, options.y3 + options.h / 2, 0, 1, 1, Quit:getWidth() / 2, Quit:getHeight() / 2)
+		love.graphics.draw(Play, options.x, options.y + options.h / 2, options.angle, options.scale, options.scale, Play:getWidth() / 2, Play:getHeight() / 2)
+		love.graphics.draw(Options, options.x, options.y2 + options.h / 2, options.angle, options.scale, options.scale, Options:getWidth() / 2, Options:getHeight() / 2)
+		love.graphics.draw(Quit, options.x, options.y3 + options.h / 2, options.angle, options.scale, options.scale, Quit:getWidth() / 2, Quit:getHeight() / 2)
 	end
 
 	-- Ends the scalling
@@ -94,12 +94,15 @@ function mainmenu:draw()
 end
 
 function mainmenu:touchpressed(id, x, y, pressure)
-	logo.scale = 0.6
+
 end
 
-function mainmenu:touchreleased( id, x, y, dx, dy, pressure )
+function mainmenu:touchreleased(id, x, y, dx, dy, pressure)
+	-- Correct touch value
+	x = (Width / screenWidth) * x
+	y = (Height / screenHeight) * y
 	-- If the touch don't move much before released
-	if dx < 20 and dy < 20 and logo.scale == 0.6 then
+	if dx < 20 and dy < 20 and logo.scale == 1 then
 		-- If release after touching the Play game Button
 		if PressedButton(x, y, options.x, options.y, options.w, options.h) then
 			Gamestate.switch(game)
@@ -111,20 +114,19 @@ function mainmenu:touchreleased( id, x, y, dx, dy, pressure )
 			love.event.quit()
 		end
 	end
+	logo.scale = 1
 end
 
 function mainmenu:keyreleased(key, isrepeat)
 	if key == "escape" then
 		love.event.quit()
-	elseif logo.scale == 0.6 then
-		Gamestate.switch(game)
 	elseif key == "return" then
-		logo.scale = 0.6
+		Gamestate.switch(optionsmenu)
 	end
 end
 
 -- function love.mousereleased( x, y, button, istouch )
--- 	if button == 1 and logo.scale == 0.6 then
+-- 	if button == 1 and logo.scale == 1 then
 -- 		-- If release after touching the Play game Button
 -- 		if PressedButton(x, y, options.x, options.y, options.w, options.h) then
 -- 			Gamestate.switch(game)
