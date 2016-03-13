@@ -1,12 +1,13 @@
 Controls = {}
 
 function Controls.load()
-	move     = {}
-	spin     = {}
-	touch    = {}
-	fire     = {}
+	move  = {}
+	spin  = {}
+	touch = {}
+	fire  = {}
+
 	-- Reference circle for moving properties
-	move.image   = love.graphics.newImage("sprites/movewglow.png")
+	move.image   = love.graphics.newImage("assets/sprites/movewglow.png")
 	move.rad     = move.image:getHeight(move.image) / 2 - 45
 	move.w       = move.image:getWidth()
 	move.h       = move.image:getHeight()
@@ -22,20 +23,20 @@ function Controls.load()
 	move.dangle  = 0
 
 	-- Fire button
-	fire.image  = love.graphics.newImage("sprites/firebutton.png")
+	fire.image  = love.graphics.newImage("assets/sprites/firebutton.png")
 
-	-- Reference buttons for spinning
-	spin.image   = love.graphics.newImage("sprites/spin.png")
-	spin.w       = spin.image:getWidth()
-	spin.h       = spin.image:getHeight()
-	spin.x       = Width - spin.w / 2 - 80
-	spin.y       = Height - spin.h - 30
-	spin.ox      = spin.w / 2
-	spin.oy      = 0
-	spin.angle   = 0
-	spin.scale   = 1
-	
-	if settings.controls == "RotationAtRight" then
+	if Settings.controls == "B" then
+		-- Reference buttons for spinning
+		spin.image   = love.graphics.newImage("assets/sprites/spin.png")
+		spin.w       = spin.image:getWidth()
+		spin.h       = spin.image:getHeight()
+		spin.x       = Width - spin.w / 2 - 80
+		spin.y       = Height - spin.h - 30
+		spin.ox      = spin.w / 2
+		spin.oy      = 0
+		spin.angle   = 0
+		spin.scale   = 1
+
 		fire.w      = fire.image:getWidth()
 		fire.h      = fire.image:getHeight()
 		fire.x      = spin.x - fire.w / 2
@@ -45,7 +46,7 @@ function Controls.load()
 		fire.angle  = 0
 		fire.scale  = 1
 
-	elseif settings.controls == "RotationAtLeft" then
+	elseif Settings.controls == "A" then
 		fire.w      = fire.image:getWidth()
 		fire.h      = fire.image:getHeight()
 		fire.x      = Width - fire.w - 80
@@ -55,6 +56,7 @@ function Controls.load()
 		fire.angle  = 0
 		fire.scale  = 1
 	end
+
 	-- Touch coordinates
 	touch.x     = 0
 	touch.y     = 0
@@ -62,6 +64,8 @@ function Controls.load()
 	-- circle
 	dx = 0
 	dy = 0
+	-- Width of the line to be draw when accelerating
+	love.graphics.setLineWidth(2)
 end
 
 function Controls.update(dt)
@@ -104,7 +108,7 @@ function Controls.update(dt)
 				end
 				-- Make it turn in the same direction of the movement, choosing the shorter way
 				-- But just if the player setted this control setting
-				if settings.controls == "RotationAtLeft" then
+				if Settings.controls == "A" then
 					-- if move.dangle < math.pi / 0.3
 					-- and move.dangle > -math.pi / 0.3 then
 					-- 	Player.body:setAngularVelocity(0)
@@ -117,7 +121,7 @@ function Controls.update(dt)
 					end
 				end
 			else
-				if settings.controls == "RotationAtRight" then
+				if Settings.controls == "B" then
 					if PressedButton(touch.x, touch.y, spin.x, spin.y, spin.w, spin.h) and touch.x > spin.x then
 							Player.body:setAngularVelocity(Player.avel)
 					elseif  PressedButton(touch.x, touch.y, spin.x, spin.y, spin.w, spin.h) and touch.x < spin.x then
@@ -153,7 +157,7 @@ function Controls.draw()
 
 	love.graphics.draw(fire.image, fire.x, fire.y, fire.angle, fire.scale, fire.scale, fire.ox, fire.oy)
 	love.graphics.draw(move.image, move.x, move.y, move.angle, move.scale, move.scale, move.ox, move.oy)
-	if settings.controls == "RotationAtRight" then
+	if Settings.controls == "B" then
 		love.graphics.draw(spin.image, spin.x, spin.y, spin.angle, spin.scale, spin.scale, spin.ox, spin.oy)
 	end
 	-- (image, xposition, yposition, rotation, multiplyimageWidth, multiplyimageHeight, xcenter, ycenter, kx, ky)

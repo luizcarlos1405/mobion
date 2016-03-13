@@ -1,33 +1,35 @@
 text = "Last colisions:"
 
+local Virus = require("enemies/virus")
+
 function beginContact(fa, fb, coll)
-	-- Destroy the bodies and erase enemies and bullets that collide
+	-- Destroy the bodies and erase viruses and bullets that collide
 	for j,b in ipairs(Player.bullets) do
 		if b.fixture == fa or b.fixture == fb then
-			for i,e in ipairs(Enemies) do
-					if e.fixture == fa or e.fixture == fb then
-					-- emit the particles (enemy explosion)
-					Particles.emit(2,           -- Particle Damping
-					math.pi / 2,                -- SpreadAngle
-					Enemies.particle,           -- ParticleImage
-					30,                         -- Number
-					300,                        -- Speed
-					10,                         -- LifeTime
-					e.red,                      -- ParticleRed
-					e.green,                    -- ParticleGreen
-					e.blue,                     -- ParticleBlue
-					e.body:getX(),              -- EmitX
-					e.body:getY(),              -- EmitY
-					b.body:getAngle())          -- EmitAngle
+			for i,v in ipairs(viruses) do
+					if v.fixture == fa or v.fixture == fb then
+					-- emit the particles (virus explosion)
+					Particles.emit(2,               -- Particle Damping
+						math.pi / 2,                -- SpreadAngle
+						Virus.particle,             -- ParticleImage
+						30,                         -- Number
+						300,                        -- Speed
+						10,                         -- LifeTime
+						255,                        -- ParticleRed
+						255,                        -- ParticleGreen
+						255,                        -- ParticleBlue
+						v.body:getX(),              -- EmitX
+						v.body:getY(),              -- EmitY
+						b.body:getAngle())          -- EmitAngle
 					-- Set where the Morri! text should appear
-					morrix = e.body:getX()
-					morriy = e.body:getY()
+					morrix = v.body:getX() - 40
+					morriy = v.body:getY()
 					morritimer = 2
-					morri:play()
-					-- Kills enemy and bullet
-					table.remove(Enemies, i)
+					Virus.deathsound:play()
+					-- Kills virus and bullet
+					table.remove(viruses, i)
 					table.remove(Player.bullets, j)
-					e.body:destroy()
+					v.body:destroy()
 					b.body:destroy()
 				end
 			end
