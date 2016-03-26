@@ -1,19 +1,19 @@
-local Mainmenu = {}
-local options = {}
-local logo    = {}
+Mainmenu = {}
 
-local Optionsmenu = require("src/optionsmenu")
+local options  = {}
+local logo     = {}
 
 function Mainmenu:enter()
 	-- Stop all audios
 	love.audio.stop()
+
 
 	-- Set random colors
 	push:setBorderColor{love.graphics.getBackgroundColor()}
 	r = love.math.random(127.5, 255)
 	g = love.math.random(127.5, 255)
 	b = love.math.random(127.5, 255)
-	-- love.graphics.setBackgroundColor(love.math.random(2,10), love.math.random(2,10), love.math.random(2,10))
+	love.graphics.setBackgroundColor(love.math.random(2,10), love.math.random(2,10), love.math.random(2,10))
 
 	-- load the logo
 	logo.palco     = love.graphics.newImage("assets/sprites/palcodev.png")
@@ -42,14 +42,17 @@ function Mainmenu:enter()
 	options.angle  = 0
 	options.scale  = 1
 
-
 	-- Load language
 	options.text = Settings.text.Mainmenu
 
 	-- Text objects creation
-	Play    = love.graphics.newText(ecranbig, options.text.Play)
-	Options = love.graphics.newText(ecranbig, options.text.Options)
-	Exit    = love.graphics.newText(ecranbig, options.text.Exit)
+	if options.text.Play == nil or options.text.Options == nil or options.text.Exit == nil then
+		LoadSettings()
+	else
+		Play    = love.graphics.newText(ecranbig, options.text.Play)
+		Options = love.graphics.newText(ecranbig, options.text.Options)
+		Exit    = love.graphics.newText(ecranbig, options.text.Exit)
+	end
 end
 
 function Mainmenu:resume()
@@ -91,18 +94,41 @@ function Mainmenu:draw()
 		love.graphics.draw(options.button, options.x, options.y3, options.angle, options.scale, options.scale, options.ox, options.oy)
 
 		-- Draw text
-		-- love.graphics.setColor(255, 255, 255)
 		love.graphics.draw(Play, options.x, options.y + options.h / 2, options.angle, options.scale, options.scale, Play:getWidth() / 2, Play:getHeight() / 2)
 		love.graphics.draw(Options, options.x, options.y2 + options.h / 2, options.angle, options.scale, options.scale, Options:getWidth() / 2, Options:getHeight() / 2)
 		love.graphics.draw(Exit, options.x, options.y3 + options.h / 2, options.angle, options.scale, options.scale, Exit:getWidth() / 2, Exit:getHeight() / 2)
 	end
+	love.graphics.setFont(ecranbig)
+	love.graphics.print(LoadedFrom, 15, 15)
 
 	-- Ends the scalling
 	push:apply("end")
 end
 
-function Mainmenu:touchpressed(id, x, y, pressure)
+function Mainmenu:leave()
+	-- Erase stuff
+	r       = nil
+	g       = nil
+	b       = nil
+	Play    = nil
+	Options = nil
+	Exit    = nil
+end
 
+function Mainmenu:touchpressed(id, x, y, dx, dy, pressure)
+	-- Correct touch value
+	x = (Width / screenWidth) * x
+	y = (Height / screenHeight) * y
+	-- Play bubble sound when touching a button
+	if PressedButton(x, y, options.x, options.y, options.w, options.h) then
+		bubble[love.math.random(1, 3)]:play()
+	-- If release after touching the menu button
+	elseif PressedButton(x, y, options.x, options.y2, options.w, options.h) then
+		bubble[love.math.random(1, 3)]:play()
+	-- If release after touching the quit button
+	elseif PressedButton(x, y, options.x, options.y3, options.w, options.h) then
+		bubble[love.math.random(1, 3)]:play()
+	end
 end
 
 function Mainmenu:touchreleased(id, x, y, dx, dy, pressure)
@@ -113,7 +139,7 @@ function Mainmenu:touchreleased(id, x, y, dx, dy, pressure)
 	if dx < 20 and dy < 20 and logo.scale == 1 then
 		-- If release after touching the Play Button
 		if PressedButton(x, y, options.x, options.y, options.w, options.h) then
-			Gamestate.switch(Game)
+			ChangeState(Game)
 		-- If release after touching the menu button
 	elseif PressedButton(x, y, options.x, options.y2, options.w, options.h) then
 			Gamestate.push(Optionsmenu)
@@ -126,27 +152,18 @@ function Mainmenu:touchreleased(id, x, y, dx, dy, pressure)
 end
 
 function Mainmenu:keyreleased(key, isrepeat)
+	bubble[love.math.random(1, 3)]:play()
 	if key == "escape" then
 		love.event.quit()
 	elseif key == "return" then
-		Gamestate.switch(Game)
+		ChangeState(Game)
 	elseif key == "m" then
 		Gamestate.push(Optionsmenu)
+	elseif key == "p" then
+		Settings.language.Current = "Português"
+		Settings.text     = Settings.language.Portuguese
+	elseif key == "e" then
+		Settings.language.Current = "English"
+		Settings.text = Settings.language.English
 	end
 end
-
-return Mainmenu
--- function love.mousereleased( x, y, button, istouch )
--- 	if button == 1 and logo.scale == 1 then
--- 		-- If release after touching the Play Game Button
--- 		if PressedButton(x, y, options.x, options.y, options.w, options.h) then
--- 			Gamestate.switch(Game)
--- 		-- If release after touching the menu button
--- 		elseif PressedButton(x, y, options.x, options.y2, options.w, options.h) then
--- 			Gamestate.switch(Optionsmenu)
--- 		-- If release after touching the quint button
--- 		elseif PressedButton(x, y, options.x, options.y3, options.w, options.h) then
--- 			love.event.quit()
--- 		end
--- 	end
--- end

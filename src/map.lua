@@ -1,4 +1,4 @@
-local Map = {}
+Map = {}
 
 function Map.load()
 	Map.rgb            = 0
@@ -31,15 +31,16 @@ function Map.load()
 end
 
 function Map.update(dt)
-	Bground.x = Player.body:getX() - Player.body:getX() / 2
-	Bground.y = Player.body:getY() - Player.body:getY() / 2
+	if Player.life > 0 then
+		Bground.x = Player.body:getX() - Player.body:getX() / 2
+		Bground.y = Player.body:getY() - Player.body:getY() / 2
 
-	-- For changing colors with the time
-	if Map.rgb > 2 * math.pi then
-		Map.rgb = 0
+		-- For changing colors with the time
+		if Map.rgb > 2 * math.pi then
+			Map.rgb = 0
+		end
+		Map.rgb = Map.rgb + Map.ColorChangeVel * dt
 	end
-	Map.rgb = Map.rgb + Map.ColorChangeVel * dt
-
 end
 
 function Map.draw()
@@ -51,5 +52,3 @@ function Map.draw()
 	love.graphics.draw(Bground.image, Bground.x, Bground.y, Bground.angle, Bground.scale, Bground.scale, Bground.ox, Bground.oy)
 	love.graphics.draw(Border.image, 0, 0)
 end
-
-return Map

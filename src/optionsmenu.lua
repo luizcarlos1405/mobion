@@ -1,7 +1,6 @@
-local Optionsmenu = {}
+Optionsmenu = {}
 
 local options = {}
-
 
 function Optionsmenu:enter()
 
@@ -65,7 +64,7 @@ function Optionsmenu:draw()
 	love.graphics.setFont(ecranbig)
 	love.graphics.draw(title.text, title.x, title.y, title.angle, title.scale, title.scale, title.text:getWidth() / 2, title.text:getHeight() / 2)
 	love.graphics.draw(Language, options.x2, options.y + options.h / 2, options.angle, options.scale, options.scale, Language:getWidth() / 2, Language:getHeight() / 2)
-	love.graphics.print(Settings.language, options.x3 - 400, options.y + 70)
+	love.graphics.print(Settings.language.Current, options.x3 - 400, options.y + 70)
 	love.graphics.draw(Control, options.x2, options.y2 + options.h / 2, options.angle, options.scale, options.scale, Control:getWidth() / 2, Control:getHeight() / 2)
 	love.graphics.print(Settings.controls, options.x3 - 400, options.y2 + 70)
 	love.graphics.draw(Save, options.x2, options.y3 + options.h / 2, options.angle, options.scale, options.scale, Save:getWidth() / 2, Save:getHeight() / 2)
@@ -76,10 +75,27 @@ function Optionsmenu:draw()
 end
 
 function Optionsmenu:leave()
-	Language       = nil
-	Control        = nil
-	Save           = nil
-	Cancel         = nil
+	-- Erase stuff
+	Language = nil
+	Control  = nil
+	Save     = nil
+	Cancel   = nil
+end
+
+function Optionsmenu:touchpressed(id, x, y, dx, dy, pressure)
+	-- Correct touch value
+	x = (Width / screenWidth) * x
+	y = (Height / screenHeight) * y
+	-- Play bubble sound when touhing a button
+	if PressedButton(x, y, options.x2, options.y2, options.w, options.h) then
+		bubble[love.math.random(1, 3)]:play()
+	elseif PressedButton(x, y, options.x2, options.y, options.w, options.h) then
+		bubble[love.math.random(1, 3)]:play()
+	elseif PressedButton(x, y, options.x2, options.y3, options.w, options.h) then
+		bubble[love.math.random(1, 3)]:play()
+	elseif PressedButton(x, y, options.x3, options.y3, options.w, options.h) then
+		bubble[love.math.random(1, 3)]:play()
+	end
 end
 
 function Optionsmenu:touchreleased(id, x, y, dx, dy, pressure)
@@ -87,45 +103,48 @@ function Optionsmenu:touchreleased(id, x, y, dx, dy, pressure)
 	x = (Width / screenWidth) * x
 	y = (Height / screenHeight) * y
 
-	if PressedButton(x, y, options.x2, options.y2, options.w, options.h) then
-		if Settings.controls == "A" then
-			Settings.controls = "B" -- switch to control rotation with right buttons
+	if dx < 20 and dy < 20 then
+		if PressedButton(x, y, options.x2, options.y2, options.w, options.h) then
+			if Settings.controls == "A" then
+				Settings.controls = "B" -- switch to control rotation with right buttons
 
-		elseif Settings.controls == "B" then
-			Settings.controls = "A" -- switch to control rotation with the left pad
+			elseif Settings.controls == "B" then
+				Settings.controls = "A" -- switch to control rotation with the left pad
 
-		end
-	elseif PressedButton(x, y, options.x2, options.y, options.w, options.h) then
-		if Settings.language == "Português" then
-			Settings.language = "English"
-			Settings.text = English
-			options.text = Settings.text.Optionsmenu
+			end
+		elseif PressedButton(x, y, options.x2, options.y, options.w, options.h) then
+			if Settings.language.Current == "Português" then
+				Settings.language.Current = "English"
+				Settings.text = Settings.language.English
+				options.text  = Settings.text.Optionsmenu
+
+			elseif Settings.language.Current == "English" then
+				Settings.language.Current = "Português"
+				Settings.text = Settings.language.Portuguese
+				options.text  = Settings.text.Optionsmenu
+			end
 			-- Re-create text objects
-			Language       = love.graphics.newText(ecranbig, options.text.Language)
-			Save           = love.graphics.newText(ecranbig, options.text.Save)
-			Cancel         = love.graphics.newText(ecranbig, options.text.Cancel)
-		elseif Settings.language == "English" then
-			Settings.language = "Português"
-			Settings.text     = Portuguese
-			options.text      = Settings.text.Optionsmenu
-			-- Re-create text objects
-			Language       = love.graphics.newText(ecranbig, options.text.Language)
-			Save           = love.graphics.newText(ecranbig, options.text.Save)
-			Cancel         = love.graphics.newText(ecranbig, options.text.Cancel)
+			Language = love.graphics.newText(ecranbig, options.text.Language)
+			Save     = love.graphics.newText(ecranbig, options.text.Save)
+			Cancel   = love.graphics.newText(ecranbig, options.text.Cancel)
+		elseif PressedButton(x, y, options.x2, options.y3, options.w, options.h) then
+			SaveSettings()
+			Gamestate.pop(Optionsmenu)
+		elseif PressedButton(x, y, options.x3, options.y3, options.w, options.h) then
+			LoadSettings()
+			Gamestate.pop(Optionsmenu)
 		end
-	elseif PressedButton(x, y, options.x2, options.y3, options.w, options.h) then
-		SaveSettings()
-		Gamestate.pop(Optionsmenu)
-	elseif PressedButton(x, y, options.x3, options.y3, options.w, options.h) then
-		LoadSettings()
-		Gamestate.pop(Optionsmenu)
 	end
 end
 
 function Optionsmenu:keyreleased(key, isrepeat)
 	if key == "escape" then
 		Gamestate.pop(Optionsmenu)
+	elseif key == "p" then
+		Settings.language.Current = "Português"
+		Settings.text     = Settings.language.Portuguese
+	elseif key == "e" then
+		Settings.language.Current = "English"
+		Settings.text = Settings.language.English
 	end
 end
-
-return Optionsmenu

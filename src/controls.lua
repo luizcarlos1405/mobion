@@ -22,6 +22,14 @@ function Controls.load()
 	move.linelen = 0
 	move.dangle  = 0
 
+	-- Touch coordinates
+	touch.x     = 0
+	touch.y     = 0
+	-- x and y components of the distance betwen the touch and the center of then
+	-- circle
+	dx = 0
+	dy = 0
+
 	-- Fire button
 	fire.image  = love.graphics.newImage("assets/sprites/firebutton.png")
 
@@ -57,13 +65,6 @@ function Controls.load()
 		fire.scale  = 1
 	end
 
-	-- Touch coordinates
-	touch.x     = 0
-	touch.y     = 0
-	-- x and y components of the distance betwen the touch and the center of then
-	-- circle
-	dx = 0
-	dy = 0
 	-- Width of the line to be draw when accelerating
 	love.graphics.setLineWidth(2)
 end
@@ -117,7 +118,7 @@ function Controls.update(dt)
 					elseif move.dangle > 0 then
 						Player.body:setAngularVelocity(Player.avel * move.dangle)
 					else
-						player.body:setAngularVelocity(0)
+						Player.body:setAngularVelocity(0)
 					end
 				end
 			else

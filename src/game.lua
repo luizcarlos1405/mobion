@@ -1,14 +1,12 @@
 Game = {}
 
-local Optionsmenu = require("src/optionsmenu")
-local Mainmenu  = require("src/mainmenu")
-local Virus     = require("enemies/virus")
-local Map       = require("src/map")
-local SButton   = {}
-local Sound     = {}
-local music     = true
+local SettingsButton = {}
+local SoundButton    = {}
+local PlayAgain      = {}
+local music          = true
 
 function Game:enter()
+	points = 0
 
 	-- audio load
 	backsound = love.audio.newSource("assets/sounds/back.mp3", "stream")
@@ -19,27 +17,39 @@ function Game:enter()
 	World = love.physics.newWorld(0, 0, true)
 	World:setCallbacks(beginContact, endContact, preSolve, postSolve)
 
+
 	-- Settings button
-	SButton.image = love.graphics.newImage("assets/sprites/engine.png")
-	SButton.w     = SButton.image:getWidth()
-	SButton.h     = SButton.image:getHeight()
-	SButton.ox    = SButton.w / 2
-	SButton.oy    = 0
-	SButton.x     = Width - SButton.ox - 30
-	SButton.y     = 30
-	SButton.r     = 0
-	SButton.scale = 1
+	SettingsButton.image = love.graphics.newImage("assets/sprites/engine.png")
+	SettingsButton.w     = SettingsButton.image:getWidth()
+	SettingsButton.h     = SettingsButton.image:getHeight()
+	SettingsButton.ox    = SettingsButton.w / 2
+	SettingsButton.oy    = 0
+	SettingsButton.x     = Width - SettingsButton.ox - 30
+	SettingsButton.y     = 30
+	SettingsButton.r     = 0
+	SettingsButton.scale = 1
 
 	-- Sound button
-	Sound.image   = love.graphics.newImage("assets/sprites/sound.png")
-	Sound.w       = Sound.image:getWidth()
-	Sound.h       = Sound.image:getHeight()
-	Sound.ox      = Sound.w / 2
-	Sound.oy      = 0
-	Sound.x       = SButton.x - Sound.w
-	Sound.y       = SButton.y
-	Sound.r       = 0
-	Sound.scale   = 1
+	SoundButton.image   = love.graphics.newImage("assets/sprites/sound.png")
+	SoundButton.w       = SoundButton.image:getWidth()
+	SoundButton.h       = SoundButton.image:getHeight()
+	SoundButton.ox      = SoundButton.w / 2
+	SoundButton.oy      = 0
+	SoundButton.x       = SettingsButton.x - SoundButton.w
+	SoundButton.y       = SettingsButton.y
+	SoundButton.r       = 0
+	SoundButton.scale   = 1
+
+	-- Play Again button
+	PlayAgain.image     = love.graphics.newImage("assets/sprites/button.png")
+	PlayAgain.w         = PlayAgain.image:getWidth()
+	PlayAgain.h         = PlayAgain.image:getHeight()
+	PlayAgain.ox        = PlayAgain.w / 2
+	PlayAgain.oy        = 0
+	PlayAgain.x         = Width / 2
+	PlayAgain.y         = Height / 2 + 200
+	PlayAgain.r         = 0
+	PlayAgain.scale     = 1
 
 	Player.load()
 	Virus.load()
@@ -93,14 +103,16 @@ function Game:update(dt)
 	World:update(dt)
 	Map.update(dt)
 	Virus.update(dt)
-	Player.update(dt)
-	Controls.update(dt)
-
+	if Player.life > 0 then
+		Player.update(dt)
+		Controls.update(dt)
+	end
 	if love.keyboard.isDown("space") then
 		Player.fire()
 	end
-
-	x, y = Player.body:getLinearVelocity()
+	if Player.life > 0 then
+		x, y = Player.body:getLinearVelocity()
+	end
 	fps = love.timer.getFPS()
 
 	Particles.update(dt)
@@ -126,31 +138,38 @@ function Game:draw()
 	-- Unset Camera
 	camera:unset()
 
-	-- Draw control off the camera movement, cus it wont move dah!
-	Controls.draw(dt)
+
+	if Player.life <= 0 then
+		love.graphics.draw(PlayAgain.image, PlayAgain.x, PlayAgain.y, PlayAgain.r, PlayAgain.scale, PlayAgain.scale, PlayAgain.ox, PlayAgain.oy)
+	else
+		-- Draw control off the camera movement, cus it wont move dah!
+		Controls.draw(dt)
+	end
 
 	-- Draw Settings button and sound button
-	love.graphics.draw(SButton.image, SButton.x, SButton.y, SButton.r, SButton.scale, SButton.scale, SButton.ox, SButton.oy)
-	love.graphics.draw(Sound.image, Sound.x, Sound.y, Sound.r, Sound.scale, Sound.scale, Sound.ox, Sound.oy)
+	love.graphics.draw(SettingsButton.image, SettingsButton.x, SettingsButton.y, SettingsButton.r, SettingsButton.scale, SettingsButton.scale, SettingsButton.ox, SettingsButton.oy)
+	love.graphics.draw(SoundButton.image, SoundButton.x, SoundButton.y, SoundButton.r, SoundButton.scale, SoundButton.scale, SoundButton.ox, SoundButton.oy)
+	love.graphics.setFont(ecranbig)
+	love.graphics.print(string.format("%i", points), 15, 30)
 
 	-- Set the font for the control text
-	love.graphics.setFont(ecran)
-
-	love.graphics.print("FPS: "..fps..
-	"\nX: "..Player.body:getX()..
-	"\ny: "..Player.body:getY()..
-	"\nAngle: "..Player.body:getAngle()..
-	"\nX velocity: "..x..
-	"\nY velocity: "..y..
-	"\nExisting bullets: "..#Player.bullets..
-	"\nScreen Width: "..Width..
-	"\nScreen Height: "..Height..
-	"\nScreen Dangle: "..move.dangle..
-	"\nExisting viruses: "..#viruses..
-	"\nLast behavior: "..Behavior..
-	"\n"..text..
-	"\nParticles systems: "..#Particles..
-	"\nSave directory: "..savedir,5, 5)
+	-- love.graphics.setFont(ecran)
+	--
+	-- love.graphics.print("FPS: "..fps..
+	-- "\nX: "..Player.body:getX()..
+	-- "\ny: "..Player.body:getY()..
+	-- "\nAngle: "..Player.body:getAngle()..
+	-- "\nX velocity: "..x..
+	-- "\nY velocity: "..y..
+	-- "\nExisting bullets: "..#Player.bullets..
+	-- "\nScreen Width: "..Width..
+	-- "\nScreen Height: "..Height..
+	-- "\nScreen Dangle: "..move.dangle..
+	-- "\nExisting viruses: "..#viruses..
+	-- "\nLast behavior: "..Behavior..
+	-- "\n"..text..
+	-- "\nParticles systems: "..#Particles..
+	-- "\nSave directory: "..savedir,5, 5)
 
 	--Ends the scalling
 	push:apply("end")
@@ -158,12 +177,17 @@ end
 
 function Game:leave()
 	-- Destroy any remanescent enemie or bullet
-	Player.bullets = {}
-	viruses = {}
+	Player.bullets = nil
+	points         = nil
+	viruses        = nil
+	backsound      = nil
+	shot           = nil
+	World          = nil
+	Points         = nil
+	SaveSettings()
 end
 
 function Game:keyreleased(key, scancode, isrepeat)
-	love.keyboard.setKeyRepeat( enable )
 
 	if key == "escape" then
 		Gamestate.switch(Mainmenu)
@@ -180,23 +204,45 @@ function Game:keyreleased(key, scancode, isrepeat)
 			music = true
 		end
 	end
+
+	bubble[love.math.random(1, 3)]:play()
+end
+
+function Game:touchpressed(id, x, y, dx, dy, pressure)
+	-- Isn't working and I don't know why T.T
+	-- Correct touch value
+	x = (Width / screenWidth) * x
+	y = (Height / screenHeight) * y
+	-- Play bubble sound when touching a button
+	if PressedButton(x, y, SettingsButton.x, SettingsButton.y, SettingsButton.w, SettingsButton.h)  then
+		bubble[love.math.random(1, 3)]:play()
+	elseif PressedButton(x, y, SoundButton.x, SoundButton.y, SoundButton.w, SoundButton.h)  then
+		bubble[love.math.random(1, 3)]:play()
+	end
 end
 
 function Game:touchreleased(id, x, y, dx, dy, pressure)
 	-- Correct touch value
 	x = (Width / screenWidth) * x
 	y = (Height / screenHeight) * y
-	-- If clicks on Settings button
- 	if PressedButton(x, y, SButton.x, SButton.y, SButton.w, SButton.h) and dx < 100 and dy < 100 then
-		Gamestate.push(Optionsmenu)
-	elseif PressedButton(x, y, Sound.x, Sound.y, Sound.w, Sound.h) and dx < 100 and dy < 100 then
-		if music then
-			backsound:pause()
-			music = false
-		else
-			backsound:resume()
-			music = true
+
+	if dx < 20 and dy < 20 then
+		-- If touches on Settings button
+		if PressedButton(x, y, SettingsButton.x, SettingsButton.y, SettingsButton.w, SettingsButton.h)  then
+			Gamestate.push(Optionsmenu)
+		-- if touches sound button
+		elseif PressedButton(x, y, SoundButton.x, SoundButton.y, SoundButton.w, SoundButton.h)  then
+			if music then
+				backsound:pause()
+				music = false
+			else
+				backsound:resume()
+				music = true
+			end
 		end
+	end
+	if Player.life <= 0 and PressedButton(x, y, PlayAgain.x, PlayAgain.y, PlayAgain.w, PlayAgain.h) then
+		Gamestate.switch(Game)
 	end
 end
 

@@ -1,4 +1,4 @@
-local Virus        = {}
+Virus        = {}
 
 function Virus.load()
 	viruses = {}
@@ -6,6 +6,7 @@ function Virus.load()
 	Virus.image    = love.graphics.newImage("assets/sprites/eneon.png")
 	Virus.particle = love.graphics.newImage("assets/sprites/particle.png")
 	Virus.deathsound = love.audio.newSource("assets/sounds/morri.mp3", "static")
+	Virus.damage     = 5
 	--Some variables
 	SpawnTime      = love.math.random(2, 3)
 	Behavior       = 1
@@ -44,7 +45,7 @@ function Virus.update(dt)
 		v.body:setAngularVelocity(0)
 		if v.betime < 0 then
 			v.betime = love.math.random(1, 2) / 2
-			v.behavior = love.math.random(1,13)
+			v.behavior = love.math.random(1,12)
 			Behavior = v.behavior
 		end
 		if v.behavior == 1 then
@@ -76,17 +77,22 @@ function Virus.update(dt)
 
 		elseif v.behavior == 8 then
 			v.body:setLinearVelocity(math.cos(v.body:getAngle()) * v.vel, math.sin(v.body:getAngle()) * v.vel)
-			v.body:setAngle(Player.body:getAngle())
-
+			if Player.life > 0 then
+				v.body:setAngle(Player.body:getAngle())
+			end
 		elseif v.behavior == 9 then
 			v.body:setLinearVelocity(math.cos(v.body:getAngle()) * v.vel, math.sin(v.body:getAngle()) * v.vel)
-			v.body:setAngle(- Player.body:getAngle())
-		elseif v.behavior == 10 or v.behavior == 11 or v.behavior == 12 or v.behavior == 13 then
-			local xdistance = Player.body:getX() - v.body:getX()
-			local ydistance = Player.body:getY() - v.body:getY()
-			local distance  = (xdistance ^ 2 + ydistance ^ 2) ^ (1 / 2)
-			v.body:setLinearVelocity((xdistance / distance) * v.vel * 2, (ydistance / distance) * v.vel * 2)
-			v.body:setAngle(v.body:getAngle() + 1)
+			if Player.life > 0 then
+				v.body:setAngle(- Player.body:getAngle())
+			end
+		elseif v.behavior == 10 or v.behavior == 11 or v.behavior == 12 then
+			if Player.life > 0 then
+				local xdistance = Player.body:getX() - v.body:getX()
+				local ydistance = Player.body:getY() - v.body:getY()
+				local distance  = (xdistance ^ 2 + ydistance ^ 2) ^ (1 / 2)
+				v.body:setLinearVelocity((xdistance / distance) * v.vel * 2, (ydistance / distance) * v.vel * 2)
+				v.body:setAngle(v.body:getAngle() + 0.2)
+			end
 		end
 	end
 
@@ -99,5 +105,3 @@ function Virus.draw()
 			love.graphics.draw(virus.image, v.body:getX(), v.body:getY(), v.body:getAngle(), 1, 1, v.r, v.r)
 	end
 end
-
-return Virus

@@ -1,8 +1,5 @@
 Player = {}
 
-require("src/camera")
-local Map = require("src/map")
-
 function Player.load()
 	Player.bullets           = {}
 	Player.shotparticle      = love.graphics.newImage("assets/sprites/sparticle.png")
@@ -16,7 +13,8 @@ function Player.load()
 	Player.fixture           = love.physics.newFixture(Player.body, Player.shape, 5)
 	Player.xvel, Player.yvel = 0, 0
 	Player.avel              = 7
-	Player.prop              = 80
+	Player.prop              = 100
+	Player.life              = 100
 	Player.cooldown          = 0
 	Player.sparktime         = 0
 	Player.fixture:setUserData("Player")
@@ -25,6 +23,7 @@ function Player.load()
 	Player.body:setLinearDamping(1)
 	Player.body:setAngularDamping(15)
 	Player.fixture:setCategory(2)
+	-- Player.body:setAngularVelocity(5)
 
 	bullimg = love.graphics.newImage("assets/sprites/bneon.png")
 end
@@ -43,19 +42,8 @@ function Player.update(dt)
 		end
 	end
 
-	camera.x = Player.body:getX() - Width / 2
-	camera.y = Player.body:getY() - Height / 2
-
-	-- if Player.body:getX() > Width / 2 then
-	-- 	camera.x = Player.body:getX() - Player.w - Width / 2
-	-- elseif Player.body:getY() > Height / 2 then
-	-- 	camera.y = Player.body:getY() - Player.h - Height / 2
-	-- elseif Player.body:getX() < Width / 2 then
-	-- 	camera.x = Player.body:getX() - Player.w - Width / 2
-	-- elseif Player.body:getY() < Height / 2 then
-	-- 	camera.y = Player.body:getY() - Player.h - Height / 2
-	-- end
-
+	camera:setPosition(Player.body:getX(), Player.body:getY())
+	-- camera:setAngle(Player.body:getAngle())
 end
 
 function Player.draw()
@@ -65,18 +53,22 @@ function Player.draw()
 	(math.sin(Map.rgb + 4/3 * math.pi) + 1) * 127.5)        --B
 
 	-- Draws the Player
-	love.graphics.draw(Player.image,                    -- Image
-	Player.body:getX(),                                 -- X position
-	Player.body:getY(),                                 -- Y position
-	Player.angle, Player.scale, Player.scale,           -- Angle and scale
-	Player.w / 2,                                       -- X center
-	Player.h / 2)                                       -- Y center
-
+	if Player.life > 0 then
+		love.graphics.draw(Player.image,                    -- Image
+		Player.body:getX(),                                 -- X position
+		Player.body:getY(),                                 -- Y position
+		Player.angle, Player.scale, Player.scale,           -- Angle and scale
+		Player.w / 2,                                       -- X center
+		Player.h / 2)                                       -- Y center
+	else
+		Gameovermenu:draw()
+	end
+	-- Draw bullets
 	for _,b in ipairs(Player.bullets) do
 		love.graphics.draw(b.image, b.body:getX(), b.body:getY(), b.body:getAngle(), b.stretch, b.stretch, b.w / 4, b.h / 2)
 	end
-
-	if Player.sparktime > 0 then
+	-- Draw shotspark
+	if Player.sparktime > 0 and Player.life > 0 then
 		love.graphics.draw(Player.shotspark,
 		Player.body:getX() + (Player.h / 2 - 12) * math.cos(Player.angle),
 		Player.body:getY() + (Player.w / 2 - 12) * math.sin(Player.angle),
@@ -84,6 +76,9 @@ function Player.draw()
 		Player.shotspark:getWidth() / 2,
 		Player.shotspark:getHeight() / 2)
 	end
+	-- Draw lifebar
+	love.graphics.setLineWidth(10)
+	love.graphics.line(camera.x + 15, camera.y + 15, camera.x + 15 + Player.life * 10, camera.y + 15)
 end
 
 function Player.fire()
@@ -99,7 +94,7 @@ function Player.fire()
 		bullet.h         = bullimg:getHeight()
 		bullet.vel       = 2000
 		bullet.stretch   = 1
-		bullet.lifetime  = 1
+		bullet.lifetime  = 0.5
 		bullet.fixture:setUserData("Bullet")
 		bullet.body:setBullet(true)
 		bullet.body:setAngle(Player.angle)
