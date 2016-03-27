@@ -99,7 +99,7 @@ function Mainmenu:draw()
 		love.graphics.draw(Exit, options.x, options.y3 + options.h / 2, options.angle, options.scale, options.scale, Exit:getWidth() / 2, Exit:getHeight() / 2)
 	end
 	love.graphics.setFont(ecranbig)
-	love.graphics.print(LoadedFrom, 15, 15)
+	-- love.graphics.print(LoadedFrom, 15, 15)
 
 	-- Ends the scalling
 	push:apply("end")

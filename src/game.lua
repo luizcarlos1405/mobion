@@ -135,9 +135,9 @@ function Game:draw()
 		love.graphics.print("Morri!",  morrix - 45 , morriy - 15)
 	end
 	Particles.draw()
+
 	-- Unset Camera
 	camera:unset()
-
 
 	if Player.life <= 0 then
 		love.graphics.draw(PlayAgain.image, PlayAgain.x, PlayAgain.y, PlayAgain.r, PlayAgain.scale, PlayAgain.scale, PlayAgain.ox, PlayAgain.oy)
@@ -165,7 +165,7 @@ function Game:draw()
 	-- "\nScreen Width: "..Width..
 	-- "\nScreen Height: "..Height..
 	-- "\nScreen Dangle: "..move.dangle..
-	-- "\nExisting viruses: "..#viruses..
+	-- "\nExisting Viruses: "..#Viruses..
 	-- "\nLast behavior: "..Behavior..
 	-- "\n"..text..
 	-- "\nParticles systems: "..#Particles..
@@ -179,11 +179,12 @@ function Game:leave()
 	-- Destroy any remanescent enemie or bullet
 	Player.bullets = nil
 	points         = nil
-	viruses        = nil
+	Viruses        = nil
 	backsound      = nil
 	shot           = nil
 	World          = nil
 	Points         = nil
+	love.audio.stop()
 	SaveSettings()
 end
 

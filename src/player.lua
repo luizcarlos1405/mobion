@@ -12,15 +12,16 @@ function Player.load()
 	Player.shape             = love.physics.newRectangleShape(Player.w, Player.h)
 	Player.fixture           = love.physics.newFixture(Player.body, Player.shape, 5)
 	Player.xvel, Player.yvel = 0, 0
-	Player.avel              = 7
-	Player.prop              = 100
+	Player.avel              = 5
+	Player.maxvel            = 500
+	Player.prop              = 150
 	Player.life              = 100
 	Player.cooldown          = 0
 	Player.sparktime         = 0
 	Player.fixture:setUserData("Player")
 	Player.body:setAngle(0)
 	Player.angle             = Player.body:getAngle() - math.pi / 2
-	Player.body:setLinearDamping(1)
+	Player.body:setLinearDamping(2)
 	Player.body:setAngularDamping(15)
 	Player.fixture:setCategory(2)
 	-- Player.body:setAngularVelocity(5)
@@ -92,9 +93,9 @@ function Player.fire()
 		bullet.image     = bullimg
 		bullet.w         = bullimg:getWidth()
 		bullet.h         = bullimg:getHeight()
-		bullet.vel       = 2000
+		bullet.vel       = 3000
 		bullet.stretch   = 1
-		bullet.lifetime  = 0.5
+		bullet.lifetime  = 2
 		bullet.fixture:setUserData("Bullet")
 		bullet.body:setBullet(true)
 		bullet.body:setAngle(Player.angle)

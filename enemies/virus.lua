@@ -1,12 +1,12 @@
 Virus        = {}
 
 function Virus.load()
-	viruses = {}
+	Viruses = {}
 	-- Virus and particles loading
 	Virus.image    = love.graphics.newImage("assets/sprites/eneon.png")
 	Virus.particle = love.graphics.newImage("assets/sprites/particle.png")
 	Virus.deathsound = love.audio.newSource("assets/sounds/morri.mp3", "static")
-	Virus.damage     = 5
+	Virus.damage     = 20
 	--Some variables
 	SpawnTime      = love.math.random(2, 3)
 	Behavior       = 1
@@ -32,7 +32,7 @@ function Virus.spawn()
 		virus.blue       = love.math.random(127.5, 255)
 		virus.body:setAngle(love.math.random(0, 2 * math.pi))
 		virus.fixture:setUserData("Enemy")
-		table.insert(viruses, virus)
+		table.insert(Viruses, virus)
 	end
 end
 
@@ -40,12 +40,12 @@ function Virus.update(dt)
 
 	SpawnTime = SpawnTime - dt
 	morritimer = morritimer - dt
-	for _,v in ipairs(viruses) do
+	for _,v in ipairs(Viruses) do
 		v.betime = v.betime - dt
 		v.body:setAngularVelocity(0)
 		if v.betime < 0 then
 			v.betime = love.math.random(1, 2) / 2
-			v.behavior = love.math.random(1,12)
+			v.behavior = love.math.random(1,13)
 			Behavior = v.behavior
 		end
 		if v.behavior == 1 then
@@ -85,7 +85,7 @@ function Virus.update(dt)
 			if Player.life > 0 then
 				v.body:setAngle(- Player.body:getAngle())
 			end
-		elseif v.behavior == 10 or v.behavior == 11 or v.behavior == 12 then
+		elseif v.behavior == 10 or v.behavior == 11 or v.behavior == 12 or v.behavior == 13 then
 			if Player.life > 0 then
 				local xdistance = Player.body:getX() - v.body:getX()
 				local ydistance = Player.body:getY() - v.body:getY()
@@ -100,7 +100,7 @@ function Virus.update(dt)
 end
 
 function Virus.draw()
-	for _,v in ipairs(viruses) do
+	for _,v in ipairs(Viruses) do
 			love.graphics.setColor(v.red, v.green, v.blue)
 			love.graphics.draw(virus.image, v.body:getX(), v.body:getY(), v.body:getAngle(), 1, 1, v.r, v.r)
 	end

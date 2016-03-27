@@ -97,16 +97,23 @@ function Controls.update(dt)
 				move.dy = move.rad * (dy / move.linelen)
 				-- gets the angle betwen the pad movement and the player
 				move.dangle  = ((math.cos(Player.body:getAngle()) * dx + math.sin(Player.body:getAngle()) * dy) / move.linelen)
-				-- If the touch is outside the circle
-				if move.linelen > move.rad then
-					-- Then use the equivalent inside the circle
-					Player.body:applyForce(move.dx * Player.prop, move.dy * Player.prop)
-				else
-					-- else you just use the real variation betwen the touch
-					-- and the center of the circle
-					Player.body:applyForce(dx * Player.prop, dy * Player.prop)
+				-- Gets current velocity so it do not get too fast
+				local xVel, yVel = Player.body:getLinearVelocity()
+				local Vel = (xVel ^ 2 + yVel ^ 2) ^ (1 / 1)
+				-- if Vel <= Player.maxvel then
+					-- If the touch is outside the circle
+					if move.linelen > move.rad then
+						-- Then use the equivalent inside the circle
+						-- Player.body:setLinearVelocity(move.dx * Player.prop, move.dy * Player.prop)
+						Player.body:applyForce(move.dx * Player.prop, move.dy * Player.prop)
+					else
+						-- else you just use the real variation betwen the touch
+						-- and the center of the circle
+						-- Player.body:setLinearVelocity(dx * Player.prop, dy * Player.prop)
+						Player.body:applyForce(dx * Player.prop, dy * Player.prop)
 
-				end
+					end
+				-- end
 				-- Make it turn in the same direction of the movement, choosing the shorter way
 				-- But just if the player setted this control setting
 				if Settings.controls == "A" then
@@ -147,6 +154,7 @@ function Controls.draw()
 			touch.y = (Height / screenHeight) * touch.y
 			-- love.graphics.print(touch.x.."  "..touch.y, 800, 800)
 			if touch.x < Width / 2 then
+				love.graphics.setLineWidth(2)
 				if move.linelen > move.rad then
 					love.graphics.line(move.x, move.y, move.x + move.dx, move.y + move.dy)
 				else
