@@ -1,6 +1,7 @@
 -- require all the stuff
 require("src/game")
-require("src/player")
+require("src/triangle")
+require("src/square")
 require("src/controls")
 require("src/colisions")
 require("src/particles")
@@ -9,19 +10,22 @@ require("enemies/virus")
 require("src/gameover")
 require("src/mainmenu")
 require("src/optionsmenu")
+require("src/shipmenu")
 require("src/camera")
 require("src/loadscreen")
 push      = require("src/push")
 Gamestate = require "src/humplib/gamestate"
 
 -- Defining some global variables
-Settings       = {}
-Width, Height  = 1920, 1080
+Settings                  = {}
+Width, Height             = 1920, 1080
 screenWidth, screenHeight = love.window.getDesktopDimensions()
 
 function love.load()
+	-- Save game stuff
 	savedir    = love.filesystem.getSaveDirectory()
 	savefile   = "save.lua"
+	love.audio.setVolume(0.2)
 
 	-- Load Settings if they already exists, if don't load the standard
 	if love.filesystem.exists(savefile) then

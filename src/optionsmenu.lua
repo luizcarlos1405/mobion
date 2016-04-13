@@ -109,7 +109,10 @@ function Optionsmenu:touchreleased(id, x, y, dx, dy, pressure)
 				Settings.controls = "B" -- switch to control rotation with right buttons
 
 			elseif Settings.controls == "B" then
-				Settings.controls = "A" -- switch to control rotation with the left pad
+				Settings.controls = "C" -- switch to control rotation with the left pad
+
+			elseif Settings.controls == "C" then
+				Settings.controls = "A"
 
 			end
 		elseif PressedButton(x, y, options.x2, options.y, options.w, options.h) then

@@ -21,6 +21,7 @@ function Controls.load()
 	move.dy      = 0
 	move.linelen = 0
 	move.dangle  = 0
+	move.avel    = 10
 
 	-- Touch coordinates
 	touch.x     = 0
@@ -63,6 +64,24 @@ function Controls.load()
 		fire.oy     = 0
 		fire.angle  = 0
 		fire.scale  = 1
+
+	elseif Settings.controls == "C" then
+		fire.image   = move.image
+		fire.rad     = move.rad
+		fire.w       = move.w
+		fire.h       = move.h
+		fire.x       = Width - (fire.w / 2 + 20)
+		fire.y       = Height - fire.h / 2 - 20
+		fire.ox      = fire.w / 2
+		fire.oy      = fire.h / 2
+		fire.angle   = 0
+		fire.scale   = 1
+		fire.dx      = 0
+		fire.dy      = 0
+		fire.linelen = 0
+		fire.dangle  = 0
+		fire.avel    = move.avel
+
 	end
 
 	-- Width of the line to be draw when accelerating
@@ -86,8 +105,8 @@ function Controls.update(dt)
 			if touch.x < Width / 2 then
 				-- Update the x and y variation betwen the touch and the center
 				-- Of the reference circle
-				dx = touch.x - move.x
-				dy = touch.y - move.y
+				local dx = touch.x - move.x
+				local dy = touch.y - move.y
 				-- Update the distance betwen the touch and the center of the
 				-- Circle
 				move.linelen = (dx ^ 2 + dy ^ 2) ^ (1 / 2)
@@ -95,46 +114,82 @@ function Controls.update(dt)
 				-- The circle
 				move.dx = move.rad * (dx / move.linelen)
 				move.dy = move.rad * (dy / move.linelen)
-				-- gets the angle betwen the pad movement and the player
-				move.dangle  = ((math.cos(Player.body:getAngle()) * dx + math.sin(Player.body:getAngle()) * dy) / move.linelen)
 				-- Gets current velocity so it do not get too fast
-				local xVel, yVel = Player.body:getLinearVelocity()
-				local Vel = (xVel ^ 2 + yVel ^ 2) ^ (1 / 1)
+				-- local xVel, yVel = Player.body:getLinearVelocity()
+				-- local Vel = (xVel ^ 2 + yVel ^ 2) ^ (1 / 1)
 				-- if Vel <= Player.maxvel then
-					-- If the touch is outside the circle
-					if move.linelen > move.rad then
-						-- Then use the equivalent inside the circle
-						-- Player.body:setLinearVelocity(move.dx * Player.prop, move.dy * Player.prop)
-						Player.body:applyForce(move.dx * Player.prop, move.dy * Player.prop)
-					else
-						-- else you just use the real variation betwen the touch
-						-- and the center of the circle
-						-- Player.body:setLinearVelocity(dx * Player.prop, dy * Player.prop)
-						Player.body:applyForce(dx * Player.prop, dy * Player.prop)
+				-- If the touch is outside the circle
+				if move.linelen > move.rad then
+					-- Then use the equivalent inside the circle
+					-- Player.body:setLinearVelocity(move.dx * Player.prop, move.dy * Player.prop)
+					Player.body:applyForce(move.dx * Player.prop, move.dy * Player.prop)
+				else
+					-- else you just use the real variation betwen the touch
+					-- and the center of the circle
+					-- Player.body:setLinearVelocity(dx * Player.prop, dy * Player.prop)
+					Player.body:applyForce(dx * Player.prop, dy * Player.prop)
 
-					end
+				end
 				-- end
 				-- Make it turn in the same direction of the movement, choosing the shorter way
 				-- But just if the player setted this control setting
 				if Settings.controls == "A" then
-					-- if move.dangle < math.pi / 0.3
-					-- and move.dangle > -math.pi / 0.3 then
-					-- 	Player.body:setAngularVelocity(0)
-					if move.dangle < 0 then
-						Player.body:setAngularVelocity(Player.avel * move.dangle)
-					elseif move.dangle > 0 then
-						Player.body:setAngularVelocity(Player.avel * move.dangle)
-					else
-						Player.body:setAngularVelocity(0)
+					-- gets the angle betwen the pad movement and the player
+					cosamod = (dx * math.cos(Player.body:getAngle() - math.pi / 2) + dy * math.sin(Player.body:getAngle() - math.pi / 2)) / move.linelen
+					cosa    = (dx * math.cos(Player.body:getAngle()) + dy * math.sin(Player.body:getAngle())) / move.linelen
+					sina    = (1 - cosamod ^ 2) ^ (1 / 2)
+
+					move.dangle = math.asin(sina)
+
+					if math.acos(cosa) < math.pi / 20 then
+						if dy < 0 then
+							Player.body:setAngle((-math.acos(dx / move.linelen)))
+						elseif dy > 0 then
+							Player.body:setAngle((math.acos(dx / move.linelen)))
+						end
+					elseif cosamod < 0 then
+						Player.body:setAngularVelocity(move.avel)
+					elseif cosamod > 0 then
+						Player.body:setAngularVelocity(-move.avel)
 					end
 				end
 			else
 				if Settings.controls == "B" then
 					if PressedButton(touch.x, touch.y, spin.x, spin.y, spin.w, spin.h) and touch.x > spin.x then
-							Player.body:setAngularVelocity(Player.avel)
+						Player.body:setAngularVelocity(Player.avel)
 					elseif  PressedButton(touch.x, touch.y, spin.x, spin.y, spin.w, spin.h) and touch.x < spin.x then
-							Player.body:setAngularVelocity(- Player.avel)
+						Player.body:setAngularVelocity(- Player.avel)
 					end
+					-- if PressedButton(touch.x, touch.y, fire.x, fire.y, fire.w, fire.h) then
+					-- 		Player.fire()
+					-- end
+				elseif Settings.controls == "C" then
+					dx = touch.x - fire.x
+					dy = touch.y - fire.y
+					fire.linelen = (dx ^ 2 + dy ^ 2) ^ (1 / 2)
+					-- Now some mathmatics to calculate the equivalent but inside
+					-- The circle
+					fire.dx = fire.rad * (dx / fire.linelen)
+					fire.dy = fire.rad * (dy / fire.linelen)
+					-- gets the angle betwen the pad movement and the player
+					cosamod = (dx * math.cos(Player.body:getAngle() - math.pi / 2) + dy * math.sin(Player.body:getAngle() - math.pi / 2)) / fire.linelen
+					cosa    = (dx * math.cos(Player.body:getAngle()) + dy * math.sin(Player.body:getAngle())) / fire.linelen
+
+					sina = (1 - cosamod ^ 2) ^ (1 / 2)
+
+					fire.dangle  = ((math.cos(Player.body:getAngle()) * dx + math.sin(Player.body:getAngle()) * dy) / fire.linelen)
+					if math.acos(cosa) < math.pi / 20 then
+						if dy < 0 then
+							Player.body:setAngle((-math.acos(dx / fire.linelen)))
+						elseif dy > 0 then
+							Player.body:setAngle((math.acos(dx / fire.linelen)))
+						end
+					elseif cosamod < 0 then
+						Player.body:setAngularVelocity(fire.avel)
+					elseif cosamod > 0 then
+						Player.body:setAngularVelocity(-fire.avel)
+					end
+					Player.fire()
 				end
 				if PressedButton(touch.x, touch.y, fire.x, fire.y, fire.w, fire.h) then
 						Player.fire()

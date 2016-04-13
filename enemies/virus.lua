@@ -17,6 +17,7 @@ function Virus.spawn()
 	if SpawnTime < 0 then
 		SpawnTime        = love.math.random(2, 4)
 		virus            = {}
+		virus.life       = 10
 		virus.image      = Virus.image
 		virus.r          = virus.image:getWidth() / 2
 		virus.x          = love.math.random(virus.r, Border.w - virus.r)
@@ -85,7 +86,7 @@ function Virus.update(dt)
 			if Player.life > 0 then
 				v.body:setAngle(- Player.body:getAngle())
 			end
-		elseif v.behavior == 10 or v.behavior == 11 or v.behavior == 12 or v.behavior == 13 then
+		elseif v.behavior >= 10 then
 			if Player.life > 0 then
 				local xdistance = Player.body:getX() - v.body:getX()
 				local ydistance = Player.body:getY() - v.body:getY()

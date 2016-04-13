@@ -2,27 +2,28 @@ Player = {}
 
 function Player.load()
 	Player.bullets           = {}
+	Player.scale             = 0.8
 	Player.shotparticle      = love.graphics.newImage("assets/sprites/sparticle.png")
 	Player.image             = love.graphics.newImage("assets/sprites/pwneon.png")
-	Player.scale             = 1
 	Player.shotspark         = love.graphics.newImage("assets/sprites/sneon.png")
-	Player.w                 = Player.image:getWidth() * Player.scale
-	Player.h                 = Player.image:getHeight() * Player.scale
+	Player.w                 = Player.image:getWidth()
+	Player.h                 = Player.image:getHeight()
 	Player.body              = love.physics.newBody(World, Width / 2, Height / 2, "dynamic")
-	Player.shape             = love.physics.newRectangleShape(Player.w, Player.h)
+	Player.shape             = love.physics.newRectangleShape(Player.w * Player.scale, Player.h * Player.scale)
 	Player.fixture           = love.physics.newFixture(Player.body, Player.shape, 5)
 	Player.xvel, Player.yvel = 0, 0
-	Player.avel              = 5
+	Player.avel              = 10
 	Player.maxvel            = 500
 	Player.prop              = 150
 	Player.life              = 100
+	Player.damage            = 5
 	Player.cooldown          = 0
 	Player.sparktime         = 0
+	Player.body:setAngle(-math.pi / 2)
+	Player.body:setLinearDamping(4)
+	Player.body:setAngularDamping(20)
+	Player.angle             = Player.body:getAngle()
 	Player.fixture:setUserData("Player")
-	Player.body:setAngle(0)
-	Player.angle             = Player.body:getAngle() - math.pi / 2
-	Player.body:setLinearDamping(2)
-	Player.body:setAngularDamping(15)
 	Player.fixture:setCategory(2)
 	-- Player.body:setAngularVelocity(5)
 
@@ -31,7 +32,7 @@ end
 
 function Player.update(dt)
 	-- Updates Player position
-	Player.angle             = Player.body:getAngle() - math.pi / 2
+	Player.angle             = Player.body:getAngle()
 	Player.xvel, Player.yvel = Player.body:getLinearVelocity()
 	Player.cooldown          = Player.cooldown - dt
 	Player.sparktime         = Player.sparktime - dt
@@ -99,9 +100,10 @@ function Player.fire()
 		bullet.fixture:setUserData("Bullet")
 		bullet.body:setBullet(true)
 		bullet.body:setAngle(Player.angle)
-		bullet.body:setX((((Player.h + 18) / 2) * math.cos(bullet.body:getAngle())) + Player.body:getX())
-		bullet.body:setY((((Player.w + 18) / 2) * math.sin(bullet.body:getAngle())) + Player.body:getY())
+		bullet.body:setX((((Player.h) / 2) * math.cos(bullet.body:getAngle())) + Player.body:getX())
+		bullet.body:setY((((Player.w) / 2) * math.sin(bullet.body:getAngle())) + Player.body:getY())
 		bullet.body:setLinearVelocity(bullet.vel * math.cos(bullet.body:getAngle()), bullet.vel * math.sin(bullet.body:getAngle()))
+		bullet.fixture:setMask(2)
 
 		Particles.emit(5,                                                  -- Particle Damping
 		math.pi / 12,                                                      -- SpreadAngle
@@ -118,6 +120,8 @@ function Player.fire()
 
 		table.insert(Player.bullets, bullet)
 
+		love.audio.setVolume(1)
 		shot:play()
+		love.audio.setVolume(0.2)
 	end
 end

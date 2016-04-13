@@ -9,12 +9,13 @@ function Game:enter()
 	points = 0
 
 	-- audio load
-	backsound = love.audio.newSource("assets/sounds/back.mp3", "stream")
+	backsound = love.audio.newSource("assets/sounds/Gunnar Olsen - Dub Zap.ogg", "stream")
 	shot      = love.audio.newSource("assets/sounds/sneon.mp3", "static")
+	ready     = love.audio.newSource("assets/sounds/readygo.ogg", "static")
 
 	-- World loading and callbacks
-	love.physics.setMeter(64)
 	World = love.physics.newWorld(0, 0, true)
+	love.physics.setMeter(64)
 	World:setCallbacks(beginContact, endContact, preSolve, postSolve)
 
 
@@ -51,51 +52,22 @@ function Game:enter()
 	PlayAgain.r         = 0
 	PlayAgain.scale     = 1
 
+	Map.load()
 	Player.load()
 	Virus.load()
 	Controls.load()
-	Map.load()
 
 	if Settings.MusicVolume ~= nil then
 		love.audio.setVolume(Settings.MusicVolume)
 	else
-		love.audio.setVolume(1)
+		love.audio.setVolume(0.2)
 	end
 	backsound:play()
+	ready:play()
 end
 
 function Game:resume()
-	if Settings.controls == "B" then
-		-- Reference buttons for spinning
-		spin.image   = love.graphics.newImage("assets/sprites/spin.png")
-		spin.w       = spin.image:getWidth()
-		spin.h       = spin.image:getHeight()
-		spin.x       = Width - spin.w / 2 - 80
-		spin.y       = Height - spin.h - 30
-		spin.ox      = spin.w / 2
-		spin.oy      = 0
-		spin.angle   = 0
-		spin.scale   = 1
-
-		fire.w      = fire.image:getWidth()
-		fire.h      = fire.image:getHeight()
-		fire.x      = spin.x - fire.w / 2
-		fire.y      = spin.y - fire.h - 15
-		fire.ox     = fire.w / 2
-		fire.oy     = 0
-		fire.angle  = 0
-		fire.scale  = 1
-
-	elseif Settings.controls == "A" then
-		fire.w      = fire.image:getWidth()
-		fire.h      = fire.image:getHeight()
-		fire.x      = Width - fire.w - 80
-		fire.y      = Height - fire.h - 80
-		fire.ox     = fire.w / 2
-		fire.oy     = 0
-		fire.angle  = 0
-		fire.scale  = 1
-	end
+	Controls.load()
 end
 
 function Game:update(dt)
@@ -104,8 +76,8 @@ function Game:update(dt)
 	Map.update(dt)
 	Virus.update(dt)
 	if Player.life > 0 then
-		Player.update(dt)
 		Controls.update(dt)
+		Player.update(dt)
 	end
 	if love.keyboard.isDown("space") then
 		Player.fire()
@@ -128,13 +100,13 @@ function Game:draw()
 
 	-- The draw functions that should run in the gama gamestate
 	Map.draw()
+	Particles.draw()
 	Virus.draw()
 	Player.draw()
 	if morritimer > 0 then
 		love.graphics.setFont(ecranbig)
 		love.graphics.print("Morri!",  morrix - 45 , morriy - 15)
 	end
-	Particles.draw()
 
 	-- Unset Camera
 	camera:unset()
@@ -153,24 +125,15 @@ function Game:draw()
 	love.graphics.print(string.format("%i", points), 15, 30)
 
 	-- Set the font for the control text
-	-- love.graphics.setFont(ecran)
-	--
-	-- love.graphics.print("FPS: "..fps..
-	-- "\nX: "..Player.body:getX()..
-	-- "\ny: "..Player.body:getY()..
-	-- "\nAngle: "..Player.body:getAngle()..
-	-- "\nX velocity: "..x..
-	-- "\nY velocity: "..y..
-	-- "\nExisting bullets: "..#Player.bullets..
-	-- "\nScreen Width: "..Width..
-	-- "\nScreen Height: "..Height..
-	-- "\nScreen Dangle: "..move.dangle..
-	-- "\nExisting Viruses: "..#Viruses..
-	-- "\nLast behavior: "..Behavior..
-	-- "\n"..text..
-	-- "\nParticles systems: "..#Particles..
-	-- "\nSave directory: "..savedir,5, 5)
 
+	-- love.graphics.setFont(ecran)
+	-- if Player.life > 0 and cosa ~= nil and sina ~= nil then
+	-- 	love.graphics.print("FPS: "..fps..
+	-- 	"\n"..text..
+	-- 	"\nmove.dangle: "..move.dangle..
+	-- 	"\ncosa: "..cosa..
+	-- 	"\nsina: "..sina,5, 5)
+	-- end
 	--Ends the scalling
 	push:apply("end")
 end
@@ -243,12 +206,10 @@ function Game:touchreleased(id, x, y, dx, dy, pressure)
 		end
 	end
 	if Player.life <= 0 and PressedButton(x, y, PlayAgain.x, PlayAgain.y, PlayAgain.w, PlayAgain.h) then
-		Gamestate.switch(Game)
+		ChangeState(Game)
 	end
 end
 
 function Game:touchpressed(id, x, y, dx, dy, pressure)
 
 end
-
--- Virus = {}

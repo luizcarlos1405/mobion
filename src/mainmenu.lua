@@ -139,12 +139,12 @@ function Mainmenu:touchreleased(id, x, y, dx, dy, pressure)
 	if dx < 20 and dy < 20 and logo.scale == 1 then
 		-- If release after touching the Play Button
 		if PressedButton(x, y, options.x, options.y, options.w, options.h) then
-			ChangeState(Game)
+			ChangeState(Shipmenu)
 		-- If release after touching the menu button
-	elseif PressedButton(x, y, options.x, options.y2, options.w, options.h) then
+		elseif PressedButton(x, y, options.x, options.y2, options.w, options.h) then
 			Gamestate.push(Optionsmenu)
 		-- If release after touching the quint button
-	elseif PressedButton(x, y, options.x, options.y3, options.w, options.h) then
+		elseif PressedButton(x, y, options.x, options.y3, options.w, options.h) then
 			love.event.quit()
 		end
 	end
@@ -156,7 +156,7 @@ function Mainmenu:keyreleased(key, isrepeat)
 	if key == "escape" then
 		love.event.quit()
 	elseif key == "return" then
-		ChangeState(Game)
+		ChangeState(Shipmenu)
 	elseif key == "m" then
 		Gamestate.push(Optionsmenu)
 	elseif key == "p" then

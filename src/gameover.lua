@@ -1,5 +1,6 @@
 Gameovermenu = {}
 ecranbigger  = love.graphics.newFont("fonts/ecran-monochrome.ttf", 120)
+
 local menu = love.graphics.newText(ecranbigger, "You lose")-- love.graphics.newImage("assets/sprites/gameovermenu.png")
 
 function Gameovermenu:draw()
