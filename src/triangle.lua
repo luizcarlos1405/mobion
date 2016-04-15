@@ -52,10 +52,6 @@ function Triangle.update(dt)
 end
 
 function Triangle.draw()
-	 -- Change color over the time
-	love.graphics.setColor((math.sin(Map.rgb) + 1) * 127.5, --R
-	(math.sin(Map.rgb + 2/3 * math.pi) + 1) * 127.5,        --G
-	(math.sin(Map.rgb + 4/3 * math.pi) + 1) * 127.5)        --B
 
 	-- Draw bullets
 	for _,b in ipairs(Triangle.bullets) do
@@ -82,18 +78,18 @@ end
 
 function Triangle.fire()
 	if Triangle.cooldown <= 0 then
-		bullet           = {}
+		bullet             = {}
 		Triangle.cooldown  = 0.2
-		bullet.body      = love.physics.newBody(World, Triangle.body:getX(), Triangle.body:getY(), "kinematic")
-		bullet.shape     = love.physics.newCircleShape(8)
-		bullet.fixture   = love.physics.newFixture(bullet.body, bullet.shape, 0.05)
+		bullet.body        = love.physics.newBody(World, Triangle.body:getX(), Triangle.body:getY(), "kinematic")
+		bullet.shape       = love.physics.newCircleShape(8)
+		bullet.fixture     = love.physics.newFixture(bullet.body, bullet.shape, 0.05)
 		Triangle.sparktime = 0.1
-		bullet.image     = bullimg
-		bullet.w         = bullimg:getWidth()
-		bullet.h         = bullimg:getHeight()
-		bullet.vel       = 3000
-		bullet.stretch   = 0.8
-		bullet.lifetime  = 2
+		bullet.image       = bullimg
+		bullet.w           = bullimg:getWidth()
+		bullet.h           = bullimg:getHeight()
+		bullet.vel         = 3000
+		bullet.stretch     = 0.8
+		bullet.lifetime    = 2
 		bullet.fixture:setUserData("Bullet")
 		bullet.body:setBullet(true)
 		bullet.body:setAngle(Triangle.angle)
@@ -111,27 +107,27 @@ function Triangle.fire()
 		-- Emit particles
 		if Triangle.sideshot == 2 then
 			Particles.emit(5,                                                  -- Particle Damping
-			math.pi / 5,                                                      -- SpreadAngle
-			Triangle.shotparticle,                                               -- ParticleImage
+			math.pi / 5,                                                       -- SpreadAngle
+			Triangle.shotparticle,                                             -- ParticleImage
 			100,                                                               -- Number
 			200,                                                               -- Speed
 			3,                                                                 -- LifeTime
-			(math.sin(Map.rgb) + 1) * 127.5,                                       -- R
-			(math.sin(Map.rgb + 2/3 * math.pi) + 1) * 127.5,                       -- G
-			(math.sin(Map.rgb + 4/3 * math.pi) + 1) * 127.5,                       -- B
+			255,                                                               -- B
+			255,                                                               -- R
+			255,                                                               -- G
 			Triangle.body:getX() + (Triangle.h / 2 - 18) * math.cos(Triangle.angle) + 25 * math.sin(Triangle.angle), -- EmitX
 			Triangle.body:getY() + (Triangle.w / 2 - 18) * math.sin(Triangle.angle) - 25 * math.cos(Triangle.angle), -- EmitY
 			Triangle.angle)                                                    -- EmitAngle
 		else
 			Particles.emit(5,                                                  -- Particle Damping
-			math.pi / 5,                                                      -- SpreadAngle
-			Triangle.shotparticle,                                               -- ParticleImage
+			math.pi / 5,                                                       -- SpreadAngle
+			Triangle.shotparticle,                                             -- ParticleImage
 			100,                                                               -- Number
 			200,                                                               -- Speed
 			3,                                                                 -- LifeTime
-			(math.sin(Map.rgb) + 1) * 127.5,                                       -- R
-			(math.sin(Map.rgb + 2/3 * math.pi) + 1) * 127.5,                       -- G
-			(math.sin(Map.rgb + 4/3 * math.pi) + 1) * 127.5,                       -- B
+			255,                                                               -- R
+			255,                                                               -- G
+			255,                                                               -- B
 			Triangle.body:getX() + (Triangle.h / 2 - 18) * math.cos(Triangle.angle) - 25 * math.sin(Triangle.angle), -- EmitX
 			Triangle.body:getY() + (Triangle.w / 2 - 18) * math.sin(Triangle.angle) + 25 * math.cos(Triangle.angle), -- EmitY
 			Triangle.angle)                                                    -- EmitAngle

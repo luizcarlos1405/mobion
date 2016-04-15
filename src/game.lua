@@ -52,6 +52,10 @@ function Game:enter()
 	PlayAgain.r         = 0
 	PlayAgain.scale     = 1
 
+	-- Color changing
+	Game.rgb            = 0
+	Game.ColorChangeVel = 0.1
+
 	Map.load()
 	Player.load()
 	Virus.load()
@@ -77,8 +81,8 @@ function Game:update(dt)
 	Virus.update(dt)
 	if Player.life > 0 then
 		Controls.update(dt)
-		Player.update(dt)
 	end
+	Player.update(dt)
 	if love.keyboard.isDown("space") then
 		Player.fire()
 	end
@@ -89,7 +93,12 @@ function Game:update(dt)
 
 	Particles.update(dt)
 
-	-- cam:lookAt(Player.body:getX(), Player.body:getY())
+	-- Color changing
+	Game.rgb = Game.rgb + Game.ColorChangeVel * dt
+	-- For changing colors with the time
+	if Game.rgb > 2 * math.pi then
+		Game.rgb = 0
+	end
 end
 
 function Game:draw()
@@ -98,10 +107,22 @@ function Game:draw()
 	-- Set camera
 	camera:set()
 
-	-- The draw functions that should run in the gama gamestate
+	-- Change color over the time
+   love.graphics.setColor((math.sin(Game.rgb + 4/3 * math.pi) + 1) * 127.5, --R
+   (math.sin(Game.rgb) + 1) * 127.5,        --G
+   (math.sin(Game.rgb + 2/3 * math.pi) + 1) * 127.5)        --B
+
+   -- The draw functions that should run in the game gamestate
 	Map.draw()
 	Particles.draw()
 	Virus.draw()
+
+	-- Change color over the time
+   love.graphics.setColor((math.sin(Game.rgb) + 1) * 127.5, --R
+   (math.sin(Game.rgb + 2/3 * math.pi) + 1) * 127.5,        --G
+   (math.sin(Game.rgb + 4/3 * math.pi) + 1) * 127.5)        --B
+
+   -- The draw Player if it's alive
 	Player.draw()
 	if morritimer > 0 then
 		love.graphics.setFont(ecranbig)
@@ -206,6 +227,7 @@ function Game:touchreleased(id, x, y, dx, dy, pressure)
 		end
 	end
 	if Player.life <= 0 and PressedButton(x, y, PlayAgain.x, PlayAgain.y, PlayAgain.w, PlayAgain.h) then
+		Player.fixture:setCategory(3)
 		ChangeState(Game)
 	end
 end

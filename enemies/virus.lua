@@ -20,8 +20,8 @@ function Virus.spawn()
 		virus.life       = 10
 		virus.image      = Virus.image
 		virus.r          = virus.image:getWidth() / 2
-		virus.x          = love.math.random(virus.r, Border.w - virus.r)
-		virus.y          = love.math.random(virus.r, Border.h)
+		virus.x          = love.math.random(virus.r + 30, Border.w - virus.r - 30)
+		virus.y          = love.math.random(virus.r + 30, Border.h - virus.r - 30)
 		virus.vel        = 400
 		virus.betime     = 0
 		virus.body       = love.physics.newBody(World, virus.x, virus.y, "dynamic")
@@ -32,6 +32,7 @@ function Virus.spawn()
 		virus.green      = love.math.random(127.5, 255)
 		virus.blue       = love.math.random(127.5, 255)
 		virus.body:setAngle(love.math.random(0, 2 * math.pi))
+		virus.fixture:setCategory(3)
 		virus.fixture:setUserData("Enemy")
 		table.insert(Viruses, virus)
 	end

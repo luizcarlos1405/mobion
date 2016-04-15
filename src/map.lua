@@ -3,7 +3,7 @@ Map = {}
 function Map.load()
 
 	-- Quads
-	tilemap = require("src/tilemap")
+	tilemap = require("src/tilemap2")
 	tilemap.img = love.graphics.newImage("assets/sprites/tilemap.png")
 	tilemap.quad =
 	{
@@ -22,8 +22,6 @@ function Map.load()
 	tilemap.bod = {}
 
 	-- Colors and scale
-	Map.rgb            = 0
-	Map.ColorChangeVel = 0.1
 	Map.scale          = 1
 	Map.angle          = 0
 
@@ -87,21 +85,10 @@ function Map.update(dt)
 	if Player.life > 0 then
 		Bground.x = Player.body:getX() - Player.body:getX() / 2
 		Bground.y = Player.body:getY() - Player.body:getY() / 2
-
-		-- For changing colors with the time
-		if Map.rgb > 2 * math.pi then
-			Map.rgb = 0
-		end
-		Map.rgb = Map.rgb + Map.ColorChangeVel * dt
 	end
 end
 
 function Map.draw()
-	-- Change color over the time
-	love.graphics.setColor((math.sin(Map.rgb) + 1) * 127.5, --R
-	(math.sin(Map.rgb + 2/3 * math.pi) + 1) * 127.5,        --G
-	(math.sin(Map.rgb + 4/3 * math.pi) + 1) * 127.5)        --B
-
 	love.graphics.draw(Bground.image, Bground.x, Bground.y, Bground.angle, Bground.scale, Bground.scale, Bground.ox, Bground.oy)
 
 	tilemap.x = 0
@@ -110,23 +97,6 @@ function Map.draw()
 		for j=1, #layer.data do
 			if tilemap.quad[layer.data[j]] then
 				love.graphics.draw(tilemap.img, tilemap.quad[layer.data[j]], tilemap.x, tilemap.y, 0, 1, 1, tilemap.tilewidth / 2, tilemap.tileheight / 2)
-				-- if layer.data[j] ~=1 and layer.data[j] ~=2 then
-				-- 	if layer.data[j] == 3 then
-				-- 		local quad = {}
-				-- 		quad.body = love.physics.newBody(World, tilemap.x, tilemap.y, "static")
-				-- 		quad.shape = tilemap.ssh
-				-- 		quad.fixture = love.physics.newFixture(quad.body, quad.shape)
-				-- 		quad.fixture:setUserData("Square Pilar")
-				-- 		table.insert(tilemap.bod, quad)
-				-- 	else
-				-- 		local quad = {}
-				-- 		quad.body = love.physics.newBody(World, tilemap.x, tilemap.y, "static")
-				-- 		quad.shape = tilemap.csh
-				-- 		quad.fixture = love.physics.newFixture(quad.body, quad.shape)
-				-- 		quad.fixture:setUserData("Circle Pilar")
-				-- 		table.insert(tilemap.bod, quad)
-				-- 	end
-				-- end
 			end
 			if j % tilemap.width == 0 then
 				tilemap.y = tilemap.y + tilemap.tileheight

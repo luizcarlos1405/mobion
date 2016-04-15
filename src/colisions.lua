@@ -5,6 +5,7 @@ function beginContact(fa, fb, coll)
 	for j,b in ipairs(Player.bullets) do
 		if b.fixture == fa or b.fixture == fb then
 			table.remove(Player.bullets, j)
+			b.fixture:destroy()
 			b.body:destroy()
 			for i,v in ipairs(Viruses) do
 				if v.fixture == fa or v.fixture == fb then
@@ -39,17 +40,17 @@ function beginContact(fa, fb, coll)
 						-- points = points - (points % 1)
 					else
 						Particles.emit(2,               -- Particle Damping
-							math.pi / 2,                -- SpreadAngle
-							Player.shotparticle,             -- ParticleImage
-							30,                         -- Number
-							300,                        -- Speed
-							10,                         -- LifeTime
-							255,                        -- ParticleRed
-							255,                        -- ParticleGreen
-							255,                        -- ParticleBlue
-							v.body:getX(),              -- EmitX
-							v.body:getY(),              -- EmitY
-							b.body:getAngle())          -- EmitAngle
+						math.pi / 2,                -- SpreadAngle
+						Player.shotparticle,             -- ParticleImage
+						30,                         -- Number
+						300,                        -- Speed
+						10,                         -- LifeTime
+						255,                        -- ParticleRed
+						255,                        -- ParticleGreen
+						255,                        -- ParticleBlue
+						v.body:getX(),              -- EmitX
+						v.body:getY(),              -- EmitY
+						b.body:getAngle())          -- EmitAngle
 					end
 				end
 			end
@@ -72,21 +73,18 @@ function preSolve(fa, fb, coll)
 				end
 				if Player.life <= 0 then
 					Particles.emit(2,               -- Particle Damping
-						2 * math.pi,                -- SpreadAngle
-						Virus.particle,             -- ParticleImage
-						100,                         -- Number
-						300,                        -- Speed
-						10,                         -- LifeTime
-						255,                        -- ParticleRed
-						255,                        -- ParticleGreen
-						255,                        -- ParticleBlue
-						Player.body:getX(),         -- EmitX
-						Player.body:getY(),         -- EmitY
-						0)                          -- EmitAngle
-						Player.fixture:destroy()
-						Player.body:destroy()
-					-- Player.image = nil
-					-- Gamestate.push(Gameovermenu)
+					2 * math.pi,                -- SpreadAngle
+					Virus.particle,             -- ParticleImage
+					100,                         -- Number
+					300,                        -- Speed
+					10,                         -- LifeTime
+					255,                        -- ParticleRed
+					255,                        -- ParticleGreen
+					255,                        -- ParticleBlue
+					Player.body:getX(),         -- EmitX
+					Player.body:getY(),         -- EmitY
+					0)                          -- EmitAngle
+					Player.fixture:setMask(3)
 				end
 			end
 		end

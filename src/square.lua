@@ -50,11 +50,6 @@ function Square.update(dt)
 end
 
 function Square.draw()
-	-- Change color over the time
-	love.graphics.setColor((math.sin(Map.rgb) + 1) * 127.5, --R
-	(math.sin(Map.rgb + 2/3 * math.pi) + 1) * 127.5,        --G
-	(math.sin(Map.rgb + 4/3 * math.pi) + 1) * 127.5)        --B
-
 	-- Draws the Square
 	if Square.life > 0 then
 		love.graphics.draw(Square.image,                    -- Image
@@ -112,9 +107,9 @@ function Square.fire()
 		100,                                                               -- Number
 		300,                                                               -- Speed
 		3,                                                                 -- LifeTime
-		(math.sin(Map.rgb) + 1) * 127.5,                                       -- R
-		(math.sin(Map.rgb + 2/3 * math.pi) + 1) * 127.5,                       -- G
-		(math.sin(Map.rgb + 4/3 * math.pi) + 1) * 127.5,                       -- B
+		255,                                                               -- R
+		255,                                                               -- G
+		255,                                                               -- B
 		Square.body:getX() + (Square.h / 2 - 20) * math.cos(Square.angle), -- EmitX
 		Square.body:getY() + (Square.w / 2 - 20) * math.sin(Square.angle), -- EmitY
 		Square.angle)      -- EmitAngle
